@@ -334,56 +334,308 @@ sequenceDiagram
     end
 ```
 
-### 4.2. Agent 1: Profile Intake Agent
-- **File:** `services/agent_orchestrator_service/agents/profile_intake_agent.py`
-- **Responsibilities:**
-  - Auto-detects the citizen's input language across 12 Indian scripts via Unicode codepoint frequencies and language markers.
-  - Normalizes Indic numerals (e.g., Devanagari `६५`, Gurmukhi `੬੫`, Telugu `౬౫`, Bengali `৬৫`, Urdu `۶۵`) into standard ASCII Arabic numerals.
-  - Performs regex slot extraction for demographic attributes: `age`, `income`, `occupation`, `state`, `gender`, `marital_status`, `land_acres`, `pucca_house`, `bpl_card`, `caste_category`, `disability_percent`, `lpg_connection`, `student_status`, `govt_employee`, and `girl_child_age`.
-  - Instantiates a strongly validated `CitizenProfile` and writes it to `UserProfileMemory`.
+### 4.2. Core Framework Abstractions: Base Agent & Shared Memory Provider
 
-### 4.3. Agent 2: Scheme Retrieval Agent
-- **File:** `services/agent_orchestrator_service/agents/scheme_retrieval_agent.py`
-- **Responsibilities:**
-  - Queries `rag-retrieval-service` using an expanded query string synthesized from the citizen's profile (e.g., `"farmer agriculture bpl kisan pension rural"`).
-  - Retrieves the top-$K$ candidate schemes ($K=10$) based on hybrid BM25 lexical score and dense trigram cosine similarity.
-  - Stores candidate scheme objects, relevance scores, and cited policy chunks in `UserProfileMemory.rag_candidates`.
+The multi-agent system is built directly on Microsoft Agent Framework core primitives (`agent-framework` and `agent-framework-orchestrations`). Two foundational abstractions underpin all 6 agents:
 
-### 4.4. Agent 3: Eligibility Rule Agent
-- **File:** `services/agent_orchestrator_service/agents/eligibility_rule_agent.py`
-- **Responsibilities:**
-  - Enforces deterministic, zero-hallucination eligibility rules exclusively on candidates retrieved by the RAG agent.
-  - Uses the **Strategy Pattern** (`_OPERATOR_STRATEGIES`) to evaluate relational operators (`lte`, `gte`, `eq`, `ne`, `in`, `contains`, `boolean_eq`, `range`).
-  - Implements demographic boundary checks (e.g., government employees are strictly disqualified from welfare income transfers; landholding $\le 5$ acres for small farmers; BPL status; age thresholds $\ge 60$ for old age pension, $18-40$ for artisans).
-  - Populates `UserProfileMemory.rule_decisions` with per-rule evaluation logs, pass/fail status, and transparent human-readable audit reasons.
+#### 4.2.1. Template-Method Base Agent: `SpecializedPipelineAgent`
+- **Source File:** `services/agent_orchestrator_service/agents/base_specialized_agent.py`
+- **Class Inheritance:** `class SpecializedPipelineAgent(BaseAgent, ISpecializedAgent)`
+- **Design Pattern:** Template Method Pattern.
+- **Architectural Purpose:** Unifies the Microsoft Agent Framework `SupportsAgentRun` protocol, session lifecycle, telemetry timers, and memory read/write audit logging across all specialized agents. Subclasses implement solely the abstract domain method:
+  ```python
+  @abstractmethod
+  async def execute_step(self, memory: UserProfileMemory) -> tuple[UserProfileMemory, AgentStepTrace]:
+      """Concrete subclass implements its single-responsibility domain logic here."""
+  ```
+- **Execution Lifecycle (`_run_pipeline_turn`):**
+  1. **Before-Run Phase:** Invokes the inner Microsoft Agent Framework `Agent.run()`, which triggers the context provider's `before_run()` hook to record a memory `'read'` audit entry.
+  2. **Domain Step Phase:** Calls the concrete agent's `execute_step(memory)` with the current session state.
+  3. **Audit & Write Phase:** Records an explicit `'write'` entry in `updated_memory.audit_log`, measures wall-clock execution time ($\Delta t$ in milliseconds), and saves the mutated `UserProfileMemory` through the memory provider.
+  4. **Downstream Emit Phase:** Appends an `AgentStepTrace` to the shared trace collector and returns an `AgentResponse` to the `SequentialBuilder` engine.
 
-### 4.5. Agent 4: Document Checklist Agent
-- **File:** `services/agent_orchestrator_service/agents/document_checklist_agent.py`
-- **Responsibilities:**
-  - Reads the list of strictly eligible scheme IDs from memory.
-  - Aggregates mandatory and optional documentation across all eligible schemes.
-  - Performs intelligent deduplication (e.g., Aadhaar card or BPL certificate is cited once across 4 eligible schemes rather than 4 duplicate bullet points).
-  - Categorizes papers by issuing authority (e.g., Revenue Department for Income/Caste Certificate, Bank for Passbook, Health Dept for Disability Certificate, Gram Panchayat for Job Card).
-  - Writes the structured list into `UserProfileMemory.document_checklist`.
+#### 4.2.2. Shared Memory Context Provider: `SharedProfileMemoryContextProvider`
+- **Source File:** `services/agent_orchestrator_service/memory/maf_context_provider.py`
+- **Class Inheritance:** `class SharedProfileMemoryContextProvider(ContextProvider)`
+- **Architectural Purpose:** Acts as the reactive memory bridge between the multi-agent pipeline and the backing persistence store (`profile-memory-service` via PostgreSQL + Redis).
+- **Core Capabilities:**
+  - **Context Provider Protocol:** Implements Microsoft Agent Framework's `ContextProvider.before_run(agent, session)` and `after_run(agent, session)`.
+  - **Dynamic System Context Injection:** Injects the citizen's normalized demographic attributes, currently retrieved scheme IDs, eligible scheme IDs, and active language into the agent prompt context.
+  - **Session State Hydration:** Provides thread-safe `load_memory() -> UserProfileMemory` and write-through `persist_memory(memory)`.
 
-### 4.6. Agent 5: Guide Manager Agent & GroundingGate
-- **File:** `services/agent_orchestrator_service/agents/guide_manager_agent.py`
-- **Responsibilities:**
-  - Enforces the **`GroundingGate`** validation check before compiling the response.
-  - Verifies that:
-    1. Every scheme included in the final output was retrieved by RAG and passed all deterministic eligibility rules.
-    2. No hallucinated scheme IDs exist outside the verified database catalog.
-    3. Mandatory scheme citations and official portals are present.
-  - Synthesizes the application steps, official helpline numbers, and web portal URLs into a localized structured markdown guide.
-  - Writes the draft guide and `GroundingReport` into memory.
+---
 
-### 4.7. Agent 6: Language-Consistency Reviewer Agent (Group-of-3 Add-On)
-- **File:** `services/agent_orchestrator_service/agents/language_reviewer_agent.py`
-- **Responsibilities:**
-  - Acts as the quality-assurance gate for multilingual integrity.
-  - **Script Consistency Audit:** Verifies that the body prose, greetings, headers, and instructions match the citizen's native script (e.g., Gurmukhi for Punjabi, Devanagari for Hindi/Marathi, Nastaliq/Arabic for Urdu).
-  - **Verbatim Scheme Name Preservation:** Inspects the generated text to ensure official Central/State scheme names (e.g., *"Pradhan Mantri Kisan Samman Nidhi"*, *"Ayushman Bharat - PM-JAY"*, *"PM Vishwakarma"*) are **never translated into unrecognisable phonetic variants or generic dictionary synonyms**, ensuring citizens can locate the exact scheme at physical Common Service Centres (CSCs).
-  - **Auto-Repair Engine:** If a scheme name is omitted or corrupted, the agent automatically restores the canonical official name and marks `repaired = True` in the `LanguageReviewReport`.
+### 4.3. Agent 1: Profile Intake Agent (Language Detection & Demographic Slot Extraction)
+
+```mermaid
+flowchart TD
+    IN["Raw Citizen Query (Text or Voice STT)<br/>+ Optional Language / Form Overrides"] --> SCRIPT["Unicode Script Range Detector<br/>(12 Indian Script Code Blocks)"]
+    SCRIPT --> DIGIT["Indic Numeral Normalizer<br/>(०-९, ੦-੯, ౦-౯, ০-৯, ۰-۹ -> 0-9)"]
+    DIGIT --> REGEX["Slot Extraction Engine<br/>(Multilingual Regex for 14 Demographic Attributes)"]
+    REGEX --> OVERRIDE["Interactive Form Overrides Merger"]
+    OVERRIDE --> MISSING["Missing Requisite Detector<br/>(age, income, occupation, residence)"]
+    MISSING --> MEM[("Shared UserProfileMemory<br/>profile, missing_profile_fields")]
+```
+
+- **Source File:** `services/agent_orchestrator_service/agents/profile_intake_agent.py`
+- **Class:** `class ProfileIntakeAgent(SpecializedPipelineAgent)`
+- **Agent Stage:** `AgentStage.PROFILE_INTAKE`
+- **Single Responsibility (SRP):** Collects citizen input in any of the 12 supported languages, normalizes numerals, extracts structured demographic/socioeconomic slots, detects missing attributes, and instantiates a strongly typed `CitizenProfile`.
+
+#### Detailed Technical Specifications:
+1. **Multilingual Script Detection Algorithm:**
+   - Evaluates Unicode codepoint distributions against 12 script ranges: Latin (`en`), Devanagari (`hi`, `mr`), Gurmukhi (`pa`), Telugu (`te`), Tamil (`ta`), Bengali (`bn`), Kannada (`kn`), Gujarati (`gu`), Malayalam (`ml`), Odia (`or`), and Perso-Arabic (`ur`).
+   - For ambiguous scripts (e.g., Devanagari shared between Hindi and Marathi), it checks domain-specific lexical markers (e.g., Marathi auxiliary verbs `आहे`, `नाही`, `उत्पन्न` vs. Hindi `है`, `नहीं`, `आय`).
+2. **Indic & Urdu Numeral Normalization Table:**
+   - Transforms all native numerals into standard ASCII Arabic digits before numeric extraction:
+     $$\text{Devanagari: } [०-९] \to [0-9], \quad \text{Gurmukhi: } [੦-੯] \to [0-9], \quad \text{Telugu: } [౦-౯] \to [0-9], \quad \text{Urdu: } [۰-۹] \to [0-9]$$
+3. **Regex Demographic Slot Extraction:**
+   - Extracts 14 distinct attributes using compiled regular expressions:
+     - **Age:** Matches patterns like `\b(\d{1,2})\s*(?:years?|साल|वर्ष|ਸਾਲ|సంవత్సరాల|வயது|বছর)\b`.
+     - **Annual Income:** Converts localized income statements (e.g., `90000`, `1.8 लाख`, `1.2L`, `₹1,20,000`) into standardized annual INR float values.
+     - **Landholding Acreage:** Detects farm size (`2 एकड़`, `2 ਏਕੜ`, `2 ఎకరాలు`, `2 acres`).
+     - **Housing Status:** Differentiates `has_pucca_house: false` from explicit statements like `पक्का घर नहीं है`, `పక్కా ఇల్లు లేదు`, `ਕੱਚਾ ਘਰ`.
+     - **BPL & Caste Category:** Identifies BPL cards, SC/ST, and OBC status.
+     - **Target Beneficiary Slots:** Disability percentages (`85% ಅಂಗವೈಕಲ್ಯ`), pregnancy/lactation, street vendor occupation, artisan trade (potter, carpenter, blacksmith), girl child age (`6 साल की बेटी`), and government employment.
+4. **State Transitions & Memory Contract:**
+   - **Reads from Memory:** `raw_query`, `preferred_language`, `profile_overrides`.
+   - **Writes to Memory:** `memory.profile` (`CitizenProfile`), `memory.missing_profile_fields` (`list[str]`), resets downstream pipeline artifacts for fresh evaluations.
+
+---
+
+### 4.4. Agent 2: Scheme Retrieval Agent (Hybrid BM25 + Vector RAG)
+
+```mermaid
+flowchart TD
+    MEM_IN[("Shared UserProfileMemory<br/>profile, raw_query, language")] --> QUERY_EXP["Multilingual Query Expander<br/>(Query + Profile Attributes + Domain Keywords)"]
+    QUERY_EXP --> RAG_CLI["RAG Client Interface<br/>(IRAGRetrievalClient)"]
+    RAG_CLI --> SERVICE["rag-retrieval-service (:8002)"]
+    SERVICE --> BM25["Okapi BM25 Lexical Scorer<br/>(Token Inverted Index)"]
+    SERVICE --> DENSE["Dense Trigram Vector Scorer<br/>(Character 3-Gram Cosine Similarity)"]
+    BM25 --> HYBRID["Hybrid Fusion Scorer<br/>0.5 * BM25 + 0.5 * Dense"]
+    DENSE --> HYBRID
+    HYBRID --> TOPK["Top-K Candidate Filter (K=10)"]
+    TOPK --> MEM_OUT[("Shared UserProfileMemory<br/>retrieved_chunks, retrieved_scheme_ids")]
+```
+
+- **Source File:** `services/agent_orchestrator_service/agents/scheme_retrieval_agent.py`
+- **Class:** `class SchemeRetrievalAgent(SpecializedPipelineAgent)`
+- **Agent Stage:** `AgentStage.SCHEME_RETRIEVAL`
+- **Single Responsibility (SRP):** Grounds the pipeline by retrieving candidate government scheme policy chunks from the official knowledge base using hybrid lexical and dense vector search.
+
+#### Detailed Technical Specifications:
+1. **Profile-Guided Query Expansion:**
+   - Ingests the citizen's unstructured raw query and enriches it with extracted profile attributes (e.g., `"rural small farmer 2 acres bpl agriculture kisan crop insurance"`).
+   - Prevents vocabulary mismatch when citizens state queries in colloquial dialect.
+2. **Dual-Tier Hybrid Retrieval Fusion:**
+   - Dispatches a `RAGQueryRequest` to `rag-retrieval-service` (`:8002`).
+   - The retrieval service executes two complementary retrieval mechanisms:
+     - **Okapi BM25 Sparse Search:** Indexes technical acronyms, portal names, and policy identifiers (`PM-KISAN`, `PMAY-G`, `CSC`, `Aadhaar`).
+     - **Dense Character Trigram Vector Search:** Generates 256-dimensional character 3-gram vectors invariant to grammatical suffixes and Indic transliteration variations.
+   - Computes normalized hybrid relevance:
+     $$\text{Score}_{\text{hybrid}} = 0.5 \cdot \text{Score}_{\text{BM25}} + 0.5 \cdot \text{Similarity}_{\text{trigram}}$$
+3. **Retrieval Depth & Grounding Citation Tracking:**
+   - Retrieves the top $K=10$ ranked chunks (`RetrievedSchemeChunk`).
+   - Extracts unique scheme IDs, preserving chunk IDs (`scheme_id::chunk_0`, `scheme_id::chunk_1`) for verification by the downstream `GroundingGate`.
+4. **State Transitions & Memory Contract:**
+   - **Reads from Memory:** `memory.profile`, `memory.profile.raw_query`, `memory.profile.language`.
+   - **Writes to Memory:** `memory.retrieved_chunks` (`list[RetrievedSchemeChunk]`), `memory.retrieved_scheme_ids` (`list[str]`).
+
+---
+
+### 4.5. Agent 3: Eligibility Rule Agent (Deterministic Strategy Engine)
+
+```mermaid
+flowchart TD
+    IN[("Shared Memory<br/>profile, retrieved_scheme_ids")] --> ITER["Iterate Each RAG-Retrieved Scheme Candidate"]
+    ITER --> FETCH["Fetch Canonical Scheme Definition & Rules"]
+    FETCH --> AND_RULES["Evaluate Mandatory AND Rules (all_of)<br/>Strategy Pattern: _OPERATOR_STRATEGIES"]
+    AND_RULES --> OR_RULES["Evaluate Alternative OR Branches (any_of_groups)<br/>Strategy Pattern: _OPERATOR_STRATEGIES"]
+    OR_RULES --> TRI_STATE{"Tri-State Classification Logic"}
+    TRI_STATE -->|Failed >= 1 Rule| INEL["INELIGIBLE<br/>Record failed rule and reason"]
+    TRI_STATE -->|Passed all & Missing 0| ELIG["ELIGIBLE<br/>Record passed rules and justifications"]
+    TRI_STATE -->|Passed >= 1 & Missing <= 2| POT["POTENTIAL<br/>Record missing verification fields"]
+    ELIG --> AUDIT["Build Rule Audit Trail & Localized Explanations"]
+    POT --> AUDIT
+    INEL --> AUDIT
+    AUDIT --> MEM_OUT[("Shared UserProfileMemory<br/>eligibility_results, eligible_scheme_ids, potential_scheme_ids")]
+```
+
+- **Source File:** `services/agent_orchestrator_service/agents/eligibility_rule_agent.py`
+- **Class:** `class EligibilityRuleAgent(SpecializedPipelineAgent)`
+- **Agent Stage:** `AgentStage.ELIGIBILITY_RULE`
+- **Single Responsibility (SRP):** Applies mathematical, deterministic eligibility rules exclusively across RAG-retrieved scheme candidates to guarantee zero false claims and strict demographic compliance.
+
+#### Detailed Technical Specifications:
+1. **Strategy Pattern Comparator Dispatch (`_OPERATOR_STRATEGIES`):**
+   - Implements isolated, stateless comparator functions for every `RuleOperator`:
+     ```python
+     _OPERATOR_STRATEGIES = {
+         RuleOperator.EQ:      lambda actual, expected: _normalize_scalar(actual) == _normalize_scalar(expected),
+         RuleOperator.NEQ:     lambda actual, expected: _normalize_scalar(actual) != _normalize_scalar(expected),
+         RuleOperator.GTE:     lambda actual, expected: actual >= expected,
+         RuleOperator.LTE:     lambda actual, expected: actual <= expected,
+         RuleOperator.GT:      lambda actual, expected: actual > expected,
+         RuleOperator.LT:      lambda actual, expected: actual < expected,
+         RuleOperator.IN:      lambda actual, expected: _normalize_scalar(actual) in [_normalize_scalar(v) for v in expected],
+         RuleOperator.NOT_IN:  lambda actual, expected: _normalize_scalar(actual) not in [_normalize_scalar(v) for v in expected],
+         RuleOperator.BOOL_IS: lambda actual, expected: bool(actual) is bool(expected),
+     }
+     ```
+2. **Atomic Condition Evaluator (`evaluate_condition`):**
+   - Compares the citizen's extracted profile value (`actual`) against the statutory threshold (`expected`).
+   - If an attribute was not provided in the query (e.g., citizen did not state landholding), it outputs `passed = None` rather than guessing.
+3. **Composite Rule Evaluator (`evaluate_scheme`):**
+   - **`all_of` Rules (Mandatory Conjunction):** All criteria must strictly evaluate to `True` (e.g., `is_govt_employee == False` AND `annual_income <= 250000`).
+   - **`any_of_groups` Rules (Alternative Disjunction):** Evaluates sets of alternative branches (e.g., citizen qualifies if BPL card holder OR rural household without pucca house).
+4. **Tri-State Classification Logic:**
+   - **`ELIGIBLE`:** $\text{failed\_rules} = \emptyset$ and $\text{missing\_fields} = \emptyset$ and $\text{passed\_rules} \neq \emptyset$.
+   - **`POTENTIAL`:** $\text{failed\_rules} = \emptyset$ and $1 \le |\text{missing\_fields}| \le 2$ and $\text{passed\_rules} \neq \emptyset$.
+   - **`INELIGIBLE`:** $|\text{failed\_rules}| \ge 1$ or disqualified by explicit exclusion boundary.
+5. **State Transitions & Memory Contract:**
+   - **Reads from Memory:** `memory.profile`, `memory.retrieved_scheme_ids`, `memory.retrieved_chunks`.
+   - **Writes to Memory:** `memory.eligibility_results` (`list[SchemeEligibilityResult]`), `memory.eligible_scheme_ids` (`list[str]`), `memory.potential_scheme_ids` (`list[str]`).
+
+---
+
+### 4.6. Agent 4: Document Checklist Agent (Intelligent Cross-Scheme Merging & Deduplication)
+
+```mermaid
+flowchart TD
+    IN[("Shared Memory<br/>eligible_scheme_ids, profile.language")] --> ITER["Iterate Each Eligible Scheme ID"]
+    ITER --> FETCH["Fetch Authoritative Document Requirements from RAG Base"]
+    FETCH --> CHECK{"Already in Merged Checklist?"}
+    CHECK -->|Yes| MERGE["Append Scheme ID to required_for_schemes<br/>(Prevent Duplicate Bullet Points)"]
+    CHECK -->|No| ADD["Clone DocumentRequirement<br/>Attach Issuing Authority & Localized Title"]
+    MERGE --> CONSOLIDATE["Assemble Consolidated Document Checklist"]
+    ADD --> CONSOLIDATE
+    CONSOLIDATE --> MEM_OUT[("Shared UserProfileMemory<br/>document_checklist")]
+```
+
+- **Source File:** `services/agent_orchestrator_service/agents/document_checklist_agent.py`
+- **Class:** `class DocumentChecklistAgent(SpecializedPipelineAgent)`
+- **Agent Stage:** `AgentStage.DOCUMENT_CHECKLIST`
+- **Single Responsibility (SRP):** Extracts required supporting documents across all eligible schemes, deduplicates identical documents, maps each document to its issuing government authority, and provides localized names.
+
+#### Detailed Technical Specifications:
+1. **Cross-Scheme Document Merging Algorithm:**
+   - Welfare programs frequently demand overlapping papers (e.g., Aadhaar Card, Bank Account Passbook, BPL Ration Card, Income Certificate).
+   - If an applicant qualifies for 4 schemes (`PM-KISAN`, `PMFBY`, `PMAY-G`, `AB-PMJAY`), naive concatenation produces 4 separate "Aadhaar Card" instructions.
+   - The agent maintains a keyed dictionary `merged_docs: dict[str, DocumentRequirement]`. When a document ID is encountered again, it appends the new scheme ID to `existing.required_for_schemes`, ensuring the paper is listed once while maintaining complete scheme traceability.
+2. **Authority Attribution & Where-to-Obtain Guidance:**
+   - Each entry in the checklist indicates the exact administrative office responsible for issuing or certifying the document:
+     - *Aadhaar Card:* UIDAI / Aadhaar Seva Kendra.
+     - *BPL / Ration Card:* Food & Civil Supplies Department.
+     - *Income / Caste Certificate:* Tehsildar / Revenue Department / CSC.
+     - *Land Records (Khasra/Khatauni):* Revenue Patwari / Bhulekh Portal.
+     - *Disability Certificate:* Chief Medical Officer (CMO) / District Hospital.
+     - *Job Card:* Gram Panchayat / Block Development Office.
+3. **State Transitions & Memory Contract:**
+   - **Reads from Memory:** `memory.eligible_scheme_ids`, `memory.profile.language`.
+   - **Writes to Memory:** `memory.document_checklist` (`list[DocumentRequirement]`).
+
+---
+
+### 4.7. Agent 5: Guide Manager Agent & GroundingGate (Citation Verification & Synthesis)
+
+```mermaid
+flowchart TD
+    IN[("Shared Memory<br/>profile, eligibility_results, document_checklist")] --> GATE["GroundingGate Invariant Audit"]
+    GATE --> INV1{"Invariant 1: RAG Citation?<br/>retrieved_scheme_ids & chunk_ids"}
+    GATE --> INV2{"Invariant 2: Deterministic Pass?<br/>failed_rules == 0 & passed > 0"}
+    GATE --> INV3{"Invariant 3: Doc Lineage?<br/>doc linked to verified scheme"}
+    INV1 & INV2 & INV3 -->|All Invariants Valid| REPORT["Generate GroundingReport (passed=True)"]
+    INV1 & INV2 & INV3 -->|Any Invariant Violated| BLOCK["Flag Ungrounded Claims & Exclude from Output"]
+    REPORT --> SYNTH["Multilingual Synthesis Engine"]
+    SYNTH --> INT_NAME["Enforce Official Verbatim Scheme Names"]
+    SYNTH --> SEC1["Section 1: Eligible Schemes + Benefits + Reasons"]
+    SYNTH --> SEC2["Section 2: Deduplicated Document Checklist"]
+    SYNTH --> SEC3["Section 3: Step-by-Step Application Procedures & Portals"]
+    SEC1 & SEC2 & SEC3 --> COMPOSE["Assemble draft_guide_text in Citizen's Language"]
+    COMPOSE --> MEM_OUT[("Shared UserProfileMemory<br/>grounding_report, draft_guide_text")]
+```
+
+- **Source File:** `services/agent_orchestrator_service/agents/guide_manager_agent.py`
+- **Class:** `class GuideManagerAgent(SpecializedPipelineAgent)`
+- **Agent Stage:** `AgentStage.GUIDE_MANAGER`
+- **Single Responsibility (SRP):** Executes the cryptographic GroundingGate audit, validates evidence lineage, and compiles a comprehensive, structured welfare application guide in the citizen's native language.
+
+#### Detailed Technical Specifications:
+1. **The Three GroundingGate Invariants (`GroundingGate.verify`):**
+   - **Invariant 1 (RAG Retrieval Lineage):** Every scheme recommended in the guide must be present in `memory.retrieved_scheme_ids` and backed by non-empty `evidence_chunk_ids`.
+   - **Invariant 2 (Deterministic Rule Passage):** The scheme must possess zero failed rules (`len(res.failed_rules) == 0`) and at least one explicitly satisfied rule (`len(res.passed_rules) > 0`).
+   - **Invariant 3 (Document Checklist Traceability):** Every document in the checklist must be linked to at least one verified eligible scheme.
+   - If any scheme fails these invariants, it is stripped from `verified_scheme_ids` and logged in `ungrounded_claims`.
+2. **Multilingual Structure Synthesis:**
+   - Synthesizes the guide using the active language pack template (`shared/data/language_packs.py`):
+     - **Greeting & Header:** Localized greeting matching cultural conventions.
+     - **Eligible Schemes List:** Formatted with official scheme titles, localized benefit summaries, and rule justifications.
+     - **Deduplicated Checklist:** Papers grouped with where-to-obtain guidance.
+     - **Step-by-Step Application Workflow:** Step 1 directs citizens to official portals (`_LOCALIZED_PORTAL_ACTION`), followed by physical CSC/Panchayat steps and toll-free helpline numbers.
+3. **State Transitions & Memory Contract:**
+   - **Reads from Memory:** `memory.profile.language`, `memory.eligibility_results`, `memory.document_checklist`.
+   - **Writes to Memory:** `memory.grounding_report` (`GroundingReport`), `memory.draft_guide_text` (`str`).
+
+---
+
+### 4.8. Agent 6: Language-Consistency Reviewer Agent (Group-of-3 Quality Assurance Add-On)
+
+```mermaid
+flowchart TD
+    IN[("Shared Memory<br/>draft_guide_text, profile.language, eligibility_results")] --> CHECK1["Check 1: Target Language Script Density Audit"]
+    CHECK1 --> RATIO["Compute Script Match Ratio (R_script)<br/>Target Codepoints / Total Indic Codepoints"]
+    RATIO --> SCRIPT_PASS{"Script Density Valid?<br/>>= 0.35 Indic / >= 0.60 English"}
+    SCRIPT_PASS -->|Missing Greeting / Low Density| REPAIR1["Prepend Localized Greeting & Fix Markers"]
+    SCRIPT_PASS -->|Valid| CHECK2["Check 2: Verbatim Scheme Name Preservation Audit"]
+    REPAIR1 --> CHECK2
+    CHECK2 --> NAME_LOOP["Iterate Official Scheme Names (e.g. PM-KISAN, AB-PMJAY)"]
+    NAME_LOOP --> NAME_FOUND{"Name Present Verbatim in Draft?"}
+    NAME_FOUND -->|Yes| MARK_INTACT["Mark as Intact"]
+    NAME_FOUND -->|No / Mistranslated| REPAIR2["Auto-Repair: Append Official Name Block"]
+    MARK_INTACT --> FINALIZE["Generate LanguageReviewReport & Final Cleaned Reply"]
+    REPAIR2 --> FINALIZE
+    FINALIZE --> MEM_OUT[("Shared UserProfileMemory<br/>language_review_report, final_reply_text")]
+```
+
+- **Source File:** `services/agent_orchestrator_service/agents/language_reviewer_agent.py`
+- **Class:** `class LanguageReviewerAgent(SpecializedPipelineAgent, ILanguageConsistencyReviewer)`
+- **Agent Stage:** `AgentStage.LANGUAGE_REVIEWER`
+- **Single Responsibility (SRP):** Acts as the final quality-assurance auditor, enforcing that the response is written consistently in the citizen's native script while strictly preserving official scheme titles verbatim without unrecognisable phonetic translation.
+
+#### Detailed Technical Specifications:
+1. **Script Consistency & Density Metric:**
+   - Computes the script match ratio $R_{\text{script}}$:
+     $$R_{\text{script}} = \frac{\text{Count}(\text{Characters in Target Unicode Range})}{\text{Count}(\text{All Alphabetic Characters})}$$
+   - For Indic languages (Hindi, Punjabi, Telugu, Tamil, Bengali, Marathi, Kannada, Gujarati, Malayalam, Odia, Urdu), the agent verifies that $R_{\text{script}} \ge 0.35$ and that localized template greetings and section markers are present.
+2. **Official Scheme Name Preservation & Anti-Corruption Invariant:**
+   - In governmental welfare administration, official scheme names (e.g., *"Pradhan Mantri Kisan Samman Nidhi"*, *"Ayushman Bharat - PM-JAY"*, *"PM Vishwakarma"*) represent legal entities. If an LLM translates "Kisan Samman Nidhi" into generic vernacular words (e.g., translating "Kisan" to "Farmer" and "Nidhi" to "Treasure Box"), the citizen cannot find the scheme on CSC service menus.
+   - The agent scans the generated guide against `expected_scheme_names` extracted from `memory.eligibility_results`.
+3. **Deterministic Auto-Repair Mechanism:**
+   - If an official scheme name is omitted or corrupted, the agent automatically restores the canonical official name block:
+     ```python
+     if missing_or_altered:
+         repair_block = "\n".join(f"- **{name}**" for name in missing_or_altered)
+         cleaned = f"{cleaned}\n\n{tpl['eligible_heading']}:\n{repair_block}"
+         repairs.append(f"Restored {len(missing_or_altered)} official scheme name(s) verbatim.")
+     ```
+4. **State Transitions & Memory Contract:**
+   - **Reads from Memory:** `memory.draft_guide_text`, `memory.profile.language`, `memory.eligibility_results`.
+   - **Writes to Memory:** `memory.language_review_report` (`LanguageReviewReport`), `memory.final_reply_text` (`str`).
+
+---
+
+### 4.9. Inter-Agent State Lifecycle & Memory Audit Ledger
+
+The table below outlines the end-to-end state transformations across `UserProfileMemory`:
+
+| Execution Order | Agent Module Name | Primary Inputs (Memory Reads) | Core Transformation / Algorithm | State Mutated (Memory Writes) | Downstream Consumer |
+|:---:|---|---|---|---|---|
+| **1** | `ProfileIntakeAgent` | `raw_query`, `preferred_language`, `profile_overrides` | 12-language Unicode script detection, Indic digit normalization, regex demographic slot extraction | `profile`, `missing_profile_fields`, resets stale state | `SchemeRetrievalAgent`, `EligibilityRuleAgent` |
+| **2** | `SchemeRetrievalAgent` | `profile`, `profile.raw_query`, `profile.language` | Profile-guided query expansion, hybrid Okapi BM25 + dense character trigram RAG search ($K=10$) | `retrieved_chunks`, `retrieved_scheme_ids` | `EligibilityRuleAgent` |
+| **3** | `EligibilityRuleAgent` | `profile`, `retrieved_scheme_ids`, `retrieved_chunks` | Deterministic Strategy Pattern comparator dispatch over statutory AND (`all_of`) and OR (`any_of_groups`) criteria | `eligibility_results`, `eligible_scheme_ids`, `potential_scheme_ids` | `DocumentChecklistAgent`, `GuideManagerAgent`, `GroundingGate` |
+| **4** | `DocumentChecklistAgent` | `eligible_scheme_ids`, `profile.language` | Cross-scheme paper merging, authority mapping, duplicate elimination while retaining scheme lineage | `document_checklist` | `GuideManagerAgent`, `GroundingGate` |
+| **5** | `GuideManagerAgent` | `profile.language`, `eligibility_results`, `document_checklist` | GroundingGate verification of RAG citations + rule passes; localized markdown synthesis with application steps and portals | `grounding_report`, `draft_guide_text` | `LanguageReviewerAgent` |
+| **6** | `LanguageReviewerAgent` | `draft_guide_text`, `profile.language`, `eligibility_results` | Script consistency density check, verbatim official scheme name integrity audit, deterministic auto-repair | `language_review_report`, `final_reply_text` | API Gateway, Client UI |
 
 ---
 
@@ -861,3 +1113,4 @@ The JanSahayak project delivers a complete, production-grade multi-agent system 
 
 ---
 *(End of Project Report)*
+
