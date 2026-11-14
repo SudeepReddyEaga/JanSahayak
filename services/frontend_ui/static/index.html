@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multilingual Government Scheme Eligibility Guide · JanSahayak AI</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <!-- ========================================================================
+       Top Navigation & Live Microservice Telemetry Header
+       ======================================================================== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-badge" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+          <path d="M2 17l10 5 10-5"></path>
+          <path d="M2 12l10 5 10-5"></path>
+        </svg>
+      </div>
+      <div>
+        <h1>JanSahayak · Multilingual Government Scheme Eligibility Guide</h1>
+        <p class="subtitle">
+          12 Indian Languages · Voice Assistant · Microsoft Agent Framework · Hybrid RAG · Redis Semantic Cache
+        </p>
+      </div>
+    </div>
+
+    <div class="health-strip" id="healthStrip">
+      <span class="pill pill-neutral">Checking microservices...</span>
+    </div>
+  </header>
+
+  <!-- Primary Navigation Tabs -->
+  <nav class="tabs-bar">
+    <button class="tab-btn active" data-tab="assistant">1. Citizen Assistant &amp; Voice</button>
+    <button class="tab-btn" data-tab="memory">2. Shared Profile Memory &amp; Audit</button>
+    <button class="tab-btn" data-tab="evaluation">3. 10-Profile Evaluation (Precision/Recall)</button>
+    <button class="tab-btn" data-tab="kb-cache">4. Schemes KB &amp; Redis Cache</button>
+  </nav>
+
+  <main class="container">
+    <!-- ======================================================================
+         TAB 1: Interactive Citizen Chat, Voice Assistant & Sequential Pipeline
+         ====================================================================== -->
+    <section id="tab-assistant" class="tab-panel active">
+      <div class="grid-two">
+        <!-- Left Column: Multilingual Voice & Text Input, Sample Prompts, Overrides -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Citizen Query, Voice &amp; Profile Intake</h2>
+            <span class="badge badge-info" id="sessionBadge">New Session</span>
+          </div>
+
+          <!-- 1-Click Multilingual Sample Citizen Queries (All 12 Supported Languages) -->
+          <div class="samples-box">
+            <label class="field-label">Quick Multilingual Sample Profiles (12 Languages):</label>
+            <div class="sample-chips" id="sampleChips"></div>
+          </div>
+
+          <!-- Language Selector & Cache Toggle -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="languageSelect" class="field-label">Citizen Language (Text &amp; Voice)</label>
+              <select id="languageSelect" class="input-control">
+                <option value="">Auto-Detect Script / Language</option>
+                <option value="en">English (en-IN)</option>
+                <option value="hi">हिन्दी — Hindi (hi-IN)</option>
+                <option value="pa">ਪੰਜਾਬੀ — Punjabi (pa-IN)</option>
+                <option value="te">తెలుగు — Telugu (te-IN)</option>
+                <option value="ta">தமிழ் — Tamil (ta-IN)</option>
+                <option value="bn">বাংলা — Bengali (bn-IN)</option>
+                <option value="mr">मराठी — Marathi (mr-IN)</option>
+                <option value="kn">ಕನ್ನಡ — Kannada (kn-IN)</option>
+                <option value="gu">ગુજરાતી — Gujarati (gu-IN)</option>
+                <option value="ml">മലയാളം — Malayalam (ml-IN)</option>
+                <option value="or">ଓଡ଼ିଆ — Odia (or-IN)</option>
+                <option value="ur">اردو — Urdu (ur-IN)</option>
+              </select>
+            </div>
+            <div class="form-group checkbox-inline">
+              <label class="checkbox-label">
+                <input type="checkbox" id="bypassCacheChk" />
+                <span>Bypass Redis Cache (Force Live Pipeline)</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Voice Assistant Bar (Gracefully progressive; never blocks text input) -->
+          <div class="voice-dock" id="voiceDock">
+            <div class="voice-controls-row">
+              <button type="button" id="voiceMicBtn" class="btn btn-voice" title="Speak your profile using your microphone in the selected language">
+                <span class="mic-dot"></span>
+                <span id="voiceMicBtnLabel">Speak in Selected Language</span>
+              </button>
+              <span class="badge badge-neutral" id="voiceLocalePill">en-IN</span>
+              <label class="checkbox-label voice-mini-chk">
+                <input type="checkbox" id="voiceAutoSendChk" />
+                <span>Auto-submit after speech</span>
+              </label>
+              <label class="checkbox-label voice-mini-chk">
+                <input type="checkbox" id="voiceAutoReadChk" />
+                <span>Auto-read reply</span>
+              </label>
+            </div>
+            <div class="voice-status-line" id="voiceStatusText">
+              Voice ready across all 12 citizen languages. Select a language and click Speak, or type below.
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="label-split">
+              <label for="citizenQuery" class="field-label">Describe your situation (Type or Dictate · Ctrl+Enter to Send)</label>
+              <button type="button" id="clearInputBtn" class="link-btn">Clear</button>
+            </div>
+            <textarea
+              id="citizenQuery"
+              rows="4"
+              class="input-control"
+              placeholder="Example: ਮੈਂ 42 ਸਾਲ ਦਾ ਪੇਂਡੂ ਕਿਸਾਨ ਹਾਂ, 2 ਏਕੜ ਜ਼ਮੀਨ ਹੈ, ਸਾਲਾਨਾ ਆਮਦਨ 95000 ਰੁਪਏ ਹੈ, ਜਾਂ मैं 65 साल का किसान हूं..."
+            ></textarea>
+          </div>
+
+          <!-- Collapsible Optional Structured Profile Overrides -->
+          <details class="override-drawer">
+            <summary>Optional Structured Profile Overrides (Interactive Form)</summary>
+            <div class="override-grid">
+              <div>
+                <label class="mini-label">Age</label>
+                <input type="number" id="ovrAge" class="input-control" placeholder="e.g., 45" min="0" max="115" />
+              </div>
+              <div>
+                <label class="mini-label">Annual Income (INR)</label>
+                <input type="number" id="ovrIncome" class="input-control" placeholder="e.g., 120000" min="0" />
+              </div>
+              <div>
+                <label class="mini-label">Gender</label>
+                <select id="ovrGender" class="input-control">
+                  <option value="">-- From Text --</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="mini-label">Occupation</label>
+                <select id="ovrOccupation" class="input-control">
+                  <option value="">-- From Text --</option>
+                  <option value="farmer">Farmer</option>
+                  <option value="student">Student</option>
+                  <option value="street_vendor">Street Vendor</option>
+                  <option value="artisan">Artisan / Craftsperson</option>
+                  <option value="small_business">Small Business</option>
+                  <option value="daily_wage_laborer">Daily Wage Laborer</option>
+                  <option value="unemployed">Unemployed</option>
+                  <option value="retired">Retired</option>
+                  <option value="govt_employee">Govt Employee</option>
+                </select>
+              </div>
+              <div>
+                <label class="mini-label">Residence</label>
+                <select id="ovrResidence" class="input-control">
+                  <option value="">-- From Text --</option>
+                  <option value="rural">Rural</option>
+                  <option value="urban">Urban</option>
+                </select>
+              </div>
+              <div>
+                <label class="mini-label">Category</label>
+                <select id="ovrCategory" class="input-control">
+                  <option value="">-- From Text --</option>
+                  <option value="General">General</option>
+                  <option value="OBC">OBC</option>
+                  <option value="SC">SC</option>
+                  <option value="ST">ST</option>
+                  <option value="EBC">EBC</option>
+                  <option value="Minority">Minority</option>
+                </select>
+              </div>
+              <div>
+                <label class="mini-label">BPL Card?</label>
+                <select id="ovrBpl" class="input-control">
+                  <option value="">-- From Text --</option>
+                  <option value="true">Yes (BPL)</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+              <div>
+                <label class="mini-label">Owns Pucca House?</label>
+                <select id="ovrPucca" class="input-control">
+                  <option value="">-- From Text --</option>
+                  <option value="false">No Pucca House</option>
+                  <option value="true">Yes</option>
+                </select>
+              </div>
+            </div>
+          </details>
+
+          <div class="action-bar">
+            <button id="submitQueryBtn" class="btn btn-primary">Find Eligible Schemes</button>
+            <button id="newSessionBtn" class="btn btn-ghost">New Session</button>
+            <button id="testParaphraseBtn" class="btn btn-secondary" title="Submit a paraphrased version of the active query to demonstrate Redis Semantic Cache Hit">
+              Demo Redis Paraphrase Hit
+            </button>
+          </div>
+        </div>
+
+        <!-- Right Column: Live 6-Agent Sequential Pipeline Visualizer + Conversation Thread -->
+        <div class="right-stack">
+          <div class="card">
+            <div class="card-header">
+              <h2>Microsoft Agent Framework Sequential Pipeline</h2>
+              <span id="cacheStatusPill" class="pill pill-neutral">Idle</span>
+            </div>
+            <div class="pipeline-list" id="pipelineSteps">
+              <div class="step-card" data-stage="profile_intake_agent">
+                <div class="step-num">1</div>
+                <div class="step-body">
+                  <strong>Profile Intake Agent</strong>
+                  <span class="step-desc">Language detection (12 langs) &amp; profile extraction → shared memory</span>
+                </div>
+                <span class="step-status">Waiting</span>
+              </div>
+              <div class="step-card" data-stage="scheme_retrieval_agent">
+                <div class="step-num">2</div>
+                <div class="step-body">
+                  <strong>Scheme Retrieval Agent (RAG)</strong>
+                  <span class="step-desc">Hybrid BM25 + Vector retrieval over scheme docs in PostgreSQL</span>
+                </div>
+                <span class="step-status">Waiting</span>
+              </div>
+              <div class="step-card" data-stage="eligibility_rule_agent">
+                <div class="step-num">3</div>
+                <div class="step-body">
+                  <strong>Eligibility Rule Agent</strong>
+                  <span class="step-desc">Deterministic rule engine evaluating retrieved scheme policies</span>
+                </div>
+                <span class="step-status">Waiting</span>
+              </div>
+              <div class="step-card" data-stage="document_checklist_agent">
+                <div class="step-num">4</div>
+                <div class="step-body">
+                  <strong>Document Checklist Agent</strong>
+                  <span class="step-desc">Deduplicated papers checklist &amp; issuing offices</span>
+                </div>
+                <span class="step-status">Waiting</span>
+              </div>
+              <div class="step-card" data-stage="guide_manager_agent">
+                <div class="step-num">5</div>
+                <div class="step-body">
+                  <strong>Guide Manager + GroundingGate</strong>
+                  <span class="step-desc">Verifies RAG/rule grounding &amp; compiles localized guide</span>
+                </div>
+                <span class="step-status">Waiting</span>
+              </div>
+              <div class="step-card" data-stage="language_reviewer_agent">
+                <div class="step-num">6</div>
+                <div class="step-body">
+                  <strong>Language-Consistency Reviewer</strong>
+                  <span class="step-desc">Verifies target language script &amp; keeps scheme names intact</span>
+                </div>
+                <span class="step-status">Waiting</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Multi-Turn Conversation History & 1-Click Follow-Up Suggestions -->
+          <div class="card">
+            <div class="card-header">
+              <h2>Interactive Session Conversation</h2>
+              <span class="badge badge-neutral" id="turnCountBadge">0 Turns</span>
+            </div>
+            <div id="chatThreadBox" class="chat-thread">
+              <p class="muted">Start by speaking or typing your profile. Follow-up turns reuse your active session memory automatically.</p>
+            </div>
+            <div id="quickFollowupsBox" class="quick-followups hidden">
+              <span class="mini-label">1-Click Follow-Up Clarifications (Refine Active Session):</span>
+              <div id="quickFollowupChips" class="sample-chips"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Citizen Eligibility Output Area -->
+      <div id="resultsContainer" class="results-area hidden">
+        <!-- Verification Banner: Language Consistency + Grounding Gate + Latency -->
+        <div class="verification-banner" id="verificationBanner"></div>
+
+        <div class="grid-two">
+          <!-- Localized Citizen Reply + Voice Read-Aloud & Export Toolbar -->
+          <div class="card">
+            <div class="card-header">
+              <h2>Verified Citizen Guide (Final Reply)</h2>
+              <div class="btn-row">
+                <span class="badge badge-success" id="replyLangBadge">en</span>
+              </div>
+            </div>
+
+            <!-- Voice Playback & Export Controls -->
+            <div class="tts-toolbar">
+              <button type="button" id="ttsPlayBtn" class="btn btn-primary btn-sm">Listen Aloud</button>
+              <button type="button" id="ttsPauseBtn" class="btn btn-secondary btn-sm" disabled>Pause</button>
+              <button type="button" id="ttsStopBtn" class="btn btn-ghost btn-sm" disabled>Stop</button>
+              <select id="ttsRateSelect" class="rate-select" title="Speech playback speed">
+                <option value="0.85">0.85x Slow</option>
+                <option value="1.0" selected>1.0x Normal</option>
+                <option value="1.2">1.2x Fast</option>
+              </select>
+              <button type="button" id="copyGuideBtn" class="btn btn-ghost btn-sm">Copy</button>
+              <button type="button" id="downloadGuideBtn" class="btn btn-ghost btn-sm">Download .txt</button>
+            </div>
+            <div class="muted tts-progress" id="ttsStatusLine"></div>
+
+            <pre id="finalReplyBox" class="reply-box"></pre>
+          </div>
+
+          <!-- Extracted Citizen Profile & Interactive Document Readiness Checklist -->
+          <div class="card">
+            <div class="card-header">
+              <h2>Extracted Profile &amp; Document Checklist</h2>
+              <span class="badge badge-info" id="docCountBadge">0 Docs</span>
+            </div>
+            <div id="extractedProfileChips" class="chip-grid"></div>
+
+            <div class="doc-progress-wrap" id="docProgressWrap">
+              <div class="label-split">
+                <h3 class="sub-heading" style="margin:0;">Required Documents Readiness</h3>
+                <span class="mini-label" id="docReadinessText">0 / 0 Ready</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="docProgressBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <div id="documentChecklistBox" class="doc-list"></div>
+          </div>
+        </div>
+
+        <!-- Eligible Schemes Detailed Cards -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Eligible Schemes, Rule-by-Rule Reasons &amp; Application Steps</h2>
+            <span class="badge badge-success" id="eligibleCountBadge">0 Eligible</span>
+          </div>
+          <div id="eligibleSchemesGrid" class="schemes-grid"></div>
+        </div>
+
+        <!-- Potential / Ineligible Audit Accordion -->
+        <div class="grid-two">
+          <div class="card">
+            <div class="card-header">
+              <h2>Needs Clarification (Potential Schemes)</h2>
+              <span class="badge badge-warn" id="potentialCountBadge">0</span>
+            </div>
+            <div id="potentialSchemesBox"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h2>Excluded Candidates (Deterministic Rule Log)</h2>
+              <span class="badge badge-neutral" id="ineligibleCountBadge">0</span>
+            </div>
+            <div id="ineligibleSchemesBox"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 2: Shared User-Profile Memory & Agent Read/Write Audit Inspector
+         ====================================================================== -->
+    <section id="tab-memory" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Shared User-Profile Memory &amp; Per-Agent Audit Log</h2>
+          <button id="refreshSessionsBtn" class="btn btn-secondary">Refresh Sessions</button>
+        </div>
+        <p class="muted">
+          Every specialized agent reads from and writes to this shared PostgreSQL + Redis memory record via
+          Microsoft Agent Framework's <code>SharedProfileMemoryContextProvider</code>.
+        </p>
+        <div class="grid-two">
+          <div>
+            <h3 class="sub-heading">Recent Citizen Sessions</h3>
+            <div id="sessionsListBox" class="sessions-list"></div>
+          </div>
+          <div>
+            <h3 class="sub-heading">Agent Memory Read/Write Audit Trail &amp; Snapshot</h3>
+            <div id="memoryInspectorBox" class="inspector-box">
+              <p class="muted">Run a query or select a session on the left to inspect shared memory.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 3: 10-Profile Precision & Recall Benchmark Evaluation Dashboard
+         ====================================================================== -->
+    <section id="tab-evaluation" class="tab-panel">
+      <div class="card">
+        <div class="card-header">
+          <h2>Evaluation Benchmark — 10 Ground-Truth Multilingual Citizen Profiles</h2>
+          <button id="runEvalBtn" class="btn btn-primary">Run 10-Profile Evaluation</button>
+        </div>
+        <p class="muted">
+          Executes all 10 labeled multilingual citizen profiles through the live 6-agent sequential pipeline
+          (with Redis cache bypassed) and reports Precision, Recall, F1, Grounding, and Language Consistency.
+        </p>
+
+        <div id="evalSummaryCards" class="kpi-grid"></div>
+        <div id="evalTableContainer" class="table-wrap"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         TAB 4: Scheme Knowledge Base & Redis Semantic Cache Inspector
+         ====================================================================== -->
+    <section id="tab-kb-cache" class="tab-panel">
+      <div class="grid-two">
+        <div class="card">
+          <div class="card-header">
+            <h2>Redis Exact &amp; Semantic Query Cache</h2>
+            <div class="btn-row">
+              <button id="refreshCacheBtn" class="btn btn-secondary">Refresh Stats</button>
+              <button id="flushCacheBtn" class="btn btn-danger">Flush Redis Cache</button>
+            </div>
+          </div>
+          <div id="redisStatsBox"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Seeded Government Welfare Schemes (PostgreSQL + RAG)</h2>
+            <span class="badge badge-info" id="kbCountBadge">0 Schemes</span>
+          </div>
+          <div class="kb-filter-bar">
+            <input type="search" id="kbSearchInput" class="input-control" placeholder="Search schemes by name, ministry, or keyword (e.g., farmer, pension, student)..." />
+            <div id="kbCategoryFilters" class="sample-chips" style="margin-top:8px;"></div>
+          </div>
+          <div id="schemesCatalogBox" class="kb-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/static/voice_controller.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

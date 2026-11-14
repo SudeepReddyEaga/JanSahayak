@@ -1,0 +1,200 @@
+# ==============================================================================
+# Docker Compose - Full Multi-Container Microservice Architecture
+# Launches:
+#   1. postgres                   (Port 5432) - Relational & JSONB Database
+#   2. redis                      (Port 6379) - Exact + Semantic Query Cache & Hot Memory
+#   3. profile-memory-service     (Port 8001) - Shared User-Profile Memory + Audit Service
+#   4. rag-retrieval-service      (Port 8002) - Scheme Knowledge Base & Hybrid RAG
+#   5. agent-orchestrator-service (Port 8003) - Microsoft Agent Framework Sequential Pipeline
+#   6. voice-speech-service       (Port 8004) - Multilingual Voice Locales & Speech Sanitizer
+#   7. api-gateway                (Port 8000) - Unified REST + SSE Gateway
+#   8. frontend-ui                (Port 3000) - Interactive Citizen & Evaluator Web UI
+# ==============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: scheme_guide_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-scheme_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scheme_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-scheme_guide_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scheme_user} -d ${POSTGRES_DB:-scheme_guide_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - scheme_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: scheme_guide_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - scheme_net
+
+  profile-memory-service:
+    build:
+      context: .
+      dockerfile: services/profile_memory_service/Dockerfile
+    container_name: scheme_guide_profile_memory
+    environment:
+      SERVICE_NAME: profile-memory-service
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-scheme_user}:${POSTGRES_PASSWORD:-scheme_pass}@postgres:5432/${POSTGRES_DB:-scheme_guide_db}
+      REDIS_URL: redis://redis:6379/0
+      REDIS_PROFILE_TTL_SECONDS: ${REDIS_PROFILE_TTL_SECONDS:-86400}
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheme_net
+
+  rag-retrieval-service:
+    build:
+      context: .
+      dockerfile: services/rag_retrieval_service/Dockerfile
+    container_name: scheme_guide_rag_retrieval
+    environment:
+      SERVICE_NAME: rag-retrieval-service
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-scheme_user}:${POSTGRES_PASSWORD:-scheme_pass}@postgres:5432/${POSTGRES_DB:-scheme_guide_db}
+      REDIS_URL: redis://redis:6379/0
+      REDIS_RAG_TTL_SECONDS: ${REDIS_RAG_TTL_SECONDS:-1800}
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheme_net
+
+  agent-orchestrator-service:
+    build:
+      context: .
+      dockerfile: services/agent_orchestrator_service/Dockerfile
+    container_name: scheme_guide_orchestrator
+    environment:
+      SERVICE_NAME: agent-orchestrator-service
+      ORCHESTRATION_MODE: microservice_http
+      PROFILE_MEMORY_SERVICE_URL: http://profile-memory-service:8001
+      RAG_RETRIEVAL_SERVICE_URL: http://rag-retrieval-service:8002
+      REDIS_URL: redis://redis:6379/0
+      SEMANTIC_CACHE_THRESHOLD: ${SEMANTIC_CACHE_THRESHOLD:-0.85}
+      LLM_PROVIDER: ${LLM_PROVIDER:-deterministic}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://localhost:11434}
+      RAG_TOP_K: ${RAG_TOP_K:-10}
+    ports:
+      - "8003:8003"
+    depends_on:
+      profile-memory-service:
+        condition: service_healthy
+      rag-retrieval-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheme_net
+
+  voice-speech-service:
+    build:
+      context: .
+      dockerfile: services/voice_speech_service/Dockerfile
+    container_name: scheme_guide_voice_speech
+    environment:
+      SERVICE_NAME: voice-speech-service
+    ports:
+      - "8004:8004"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8004/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheme_net
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: services/api_gateway/Dockerfile
+    container_name: scheme_guide_api_gateway
+    environment:
+      SERVICE_NAME: api-gateway
+      ORCHESTRATION_MODE: microservice_http
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-scheme_user}:${POSTGRES_PASSWORD:-scheme_pass}@postgres:5432/${POSTGRES_DB:-scheme_guide_db}
+      REDIS_URL: redis://redis:6379/0
+      PROFILE_MEMORY_SERVICE_URL: http://profile-memory-service:8001
+      RAG_RETRIEVAL_SERVICE_URL: http://rag-retrieval-service:8002
+      AGENT_ORCHESTRATOR_SERVICE_URL: http://agent-orchestrator-service:8003
+      VOICE_SPEECH_SERVICE_URL: http://voice-speech-service:8004
+    ports:
+      - "8000:8000"
+    depends_on:
+      agent-orchestrator-service:
+        condition: service_healthy
+      voice-speech-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scheme_net
+
+  frontend-ui:
+    build:
+      context: .
+      dockerfile: services/frontend_ui/Dockerfile
+    container_name: scheme_guide_frontend_ui
+    ports:
+      - "3000:3000"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+    networks:
+      - scheme_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  scheme_net:
+    driver: bridge
+

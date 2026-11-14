@@ -1,0 +1,73 @@
+[
+  {
+    "profile_id": "P01",
+    "label": "Hindi Elderly Rural Small Farmer (BPL, No Pucca House)",
+    "language": "hi",
+    "query": "मैं 65 साल का किसान हूं। मैं गांव में रहता हूं, मेरे पास 2 एकड़ खेती की जमीन है, सालाना आय 90000 रुपये है, BPL कार्ड है और पक्का घर नहीं है।",
+    "expected_scheme_ids": ["PM-KISAN", "PMFBY", "PMAY-G", "AB-PMJAY", "IGNOAPS", "MGNREGA"]
+  },
+  {
+    "profile_id": "P02",
+    "label": "Telugu Rural Widowed Woman Laborer (BPL, No LPG, No Pucca House)",
+    "language": "te",
+    "query": "నేను 48 సంవత్సరాల గ్రామీణ వితంతువు మహిళను మరియు కూలీ పని చేస్తాను. నాకు బిపిఎల్ కార్డు ఉంది, వార్షిక ఆదాయం 75000 రూపాయలు, నాకు గ్యాస్ కనెక్షన్ లేదు మరియు పక్కా ఇల్లు లేదు.",
+    "expected_scheme_ids": ["PMAY-G", "AB-PMJAY", "PMUY", "IGNWPS", "MGNREGA"]
+  },
+  {
+    "profile_id": "P03",
+    "label": "English Urban OBC Undergraduate Engineering Student",
+    "language": "en",
+    "query": "I am a 20-year-old male undergraduate college student from the OBC category living in an urban city. My family annual income is 180000 INR.",
+    "expected_scheme_ids": ["AB-PMJAY", "NSP-PMS", "PM-YASASVI"]
+  },
+  {
+    "profile_id": "P04",
+    "label": "Tamil Rural Pregnant Woman (SC Category, Low Income, No LPG)",
+    "language": "ta",
+    "query": "நான் 26 வயது கர்ப்பிணிப் பெண், கிராமத்தில் வசிக்கிறேன், வேலையற்ற நிலை, SC பிரிவைச் சேர்ந்தவர், குடும்ப ஆண்டு வருமானம் 120000 ரூபாய், எனக்கு கேஸ் இணைப்பு இல்லை, அரசு ஊழியர் அல்ல.",
+    "expected_scheme_ids": ["AB-PMJAY", "PMUY", "PMMVY", "MGNREGA"]
+  },
+  {
+    "profile_id": "P05",
+    "label": "Bengali Urban Street Vendor",
+    "language": "bn",
+    "query": "আমি ৩৪ বছর বয়সী শহরের একজন রাস্তার হকার। আমার বার্ষিক আয় ১৮০০০০ টাকা এবং আমি সরকারি কর্মচারী নই।",
+    "expected_scheme_ids": ["AB-PMJAY", "PM-SVANIDHI", "PMMY"]
+  },
+  {
+    "profile_id": "P06",
+    "label": "Marathi Rural Potter Artisan (No Pucca House)",
+    "language": "mr",
+    "query": "मी 38 वर्षांचा ग्रामीण भागातील कुंभार कारागीर आहे. माझे वार्षिक उत्पन्न 140000 रुपये आहे, मला पक्के घर नाही आणि मी सरकारी नोकरदार नाही.",
+    "expected_scheme_ids": ["PMAY-G", "AB-PMJAY", "PM-VISHWAKARMA", "PMMY", "MGNREGA"]
+  },
+  {
+    "profile_id": "P07",
+    "label": "Kannada Rural Citizen with 85% Severe Disability (BPL, Unemployed)",
+    "language": "kn",
+    "query": "ನಾನು 42 ವರ್ಷದ ಗ್ರಾಮೀಣ ವ್ಯಕ್ತಿ, ನನಗೆ 85% ಅಂಗವೈಕಲ್ಯವಿದೆ, ಬಿಪಿಎಲ್ ಕಾರ್ಡ್ ಇದೆ, ವಾರ್ಷಿಕ ಆದಾಯ 80000 ರೂಪಾಯಿ, ಪಕ್ಕಾ ಮನೆ ಇಲ್ಲ ಮತ್ತು ನಿರುದ್ಯೋಗಿ, ಸರ್ಕಾರಿ ನೌಕರರಲ್ಲ.",
+    "expected_scheme_ids": ["PMAY-G", "AB-PMJAY", "IGNDPS", "ADIP-DIVYANG", "MGNREGA"]
+  },
+  {
+    "profile_id": "P08",
+    "label": "English Urban Small Business Parent with 6-Year-Old Girl Child",
+    "language": "en",
+    "query": "I am a 35-year-old urban small business owner with an annual income of 550000 INR and I have a 6-year-old girl child.",
+    "expected_scheme_ids": ["PMMY", "SSY"]
+  },
+  {
+    "profile_id": "P09",
+    "label": "Hindi Urban Senior Citizen 74 Years Old (Non-BPL, Income 3.2L)",
+    "language": "hi",
+    "query": "मैं 74 साल का शहरी रिटायर्ड बुजुर्ग हूं, मेरी सालाना आय 320000 रुपये है और मेरे पास BPL कार्ड नहीं है।",
+    "expected_scheme_ids": ["AB-PMJAY"]
+  },
+  {
+    "profile_id": "P10",
+    "label": "English High-Income Urban Government Employee (Negative Control)",
+    "language": "en",
+    "query": "I am a 40-year-old male government employee living in an urban city with annual income 1200000 INR and a pucca house.",
+    "expected_scheme_ids": []
+  }
+]
+

@@ -1,0 +1,24 @@
+# ==============================================================================
+# Project Configuration for Multilingual Government Scheme Eligibility Guide
+# Defines packaging metadata, pytest discovery settings, and code style rules.
+# ==============================================================================
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "multilingual-scheme-eligibility-guide"
+version = "1.0.0"
+description = "Q14 Group 14 - Multilingual Government Scheme Eligibility Guide using Microsoft Agent Framework, Microservices, PostgreSQL, Redis, and RAG"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+# Discover all test files under the tests/ directory
+testpaths = ["tests"]
+# Automatically add repository root to sys.path so shared/ and services/ resolve cleanly
+pythonpath = ["."]
+# Output concise summary of passed/failed tests
+addopts = "-v --tb=short"
+

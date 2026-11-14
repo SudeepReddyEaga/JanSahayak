@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JanSahayak: Multilingual Government Scheme Eligibility Guide — Project Report</title>
+  <style>
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+        color: #000;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+      .cover-page {
+        height: 98vh;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 40px 10px !important;
+      }
+      a {
+        text-decoration: none;
+        color: #000;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #24292f;
+      background-color: #f6f8fa;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .report-container {
+      max-width: 950px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 40px 60px;
+      border: 1px solid #d0d7de;
+      border-radius: 8px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    /* Cover Page Styling */
+    .cover-page {
+      font-family: "Times New Roman", Times, serif;
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: 30px;
+      border: 1.5px solid #222;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+
+    .cover-course-header {
+      font-size: 19px;
+      font-weight: bold;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      color: #111;
+    }
+
+    .cover-semester {
+      font-size: 15px;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .lpu-branding {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin: 25px 0 35px 0;
+    }
+
+    .lpu-seal {
+      width: 105px;
+      height: 105px;
+      flex-shrink: 0;
+    }
+
+    .lpu-text-blocks {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lpu-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .lpu-box {
+      display: inline-block;
+      background-color: #f37023;
+      color: #111;
+      font-weight: 900;
+      font-size: 20px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      text-align: center;
+      border: 2px solid #222;
+      border-radius: 2px;
+      font-family: Arial, sans-serif;
+    }
+
+    .lpu-rest {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #222;
+      font-family: Arial, sans-serif;
+    }
+
+    .cover-title {
+      font-size: 26px;
+      font-weight: bold;
+      font-style: italic;
+      line-height: 1.35;
+      color: #111;
+      margin-top: 30px;
+      margin-bottom: 8px;
+    }
+
+    .cover-subtitle {
+      font-size: 16px;
+      font-style: italic;
+      color: #444;
+      margin-bottom: 25px;
+    }
+
+    .cover-submitted-label {
+      font-size: 16px;
+      margin: 20px 0 12px 0;
+      color: #222;
+    }
+
+    .student-table {
+      width: 88%;
+      max-width: 620px;
+      margin: 0 auto 20px auto;
+      border-collapse: collapse;
+      font-family: "Times New Roman", Times, serif;
+      font-size: 15px;
+      text-align: left;
+      border: 1.5px solid #222;
+    }
+
+    .student-table th {
+      background-color: #f5f5f5;
+      padding: 9px 12px;
+      border: 1px solid #333;
+      font-weight: bold;
+    }
+
+    .student-table td {
+      padding: 9px 12px;
+      border: 1px solid #333;
+    }
+
+    .cover-metadata {
+      font-size: 15.5px;
+      margin: 4px 0;
+      color: #111;
+    }
+
+    .cover-guide-title {
+      font-size: 15px;
+      margin-top: 20px;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .cover-guide-name {
+      font-size: 17.5px;
+      font-weight: bold;
+      color: #111;
+    }
+
+    .cover-guide-id {
+      font-size: 15px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    .cover-footer {
+      font-size: 15.5px;
+      font-weight: bold;
+      color: #111;
+      line-height: 1.4;
+    }
+
+    /* Body Document Styling */
+    h1, h2, h3, h4 {
+      color: #0d1117;
+      border-bottom: 1px solid #d0d7de;
+      padding-bottom: 0.3em;
+      margin-top: 24px;
+      margin-bottom: 16px;
+    }
+
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; margin-top: 32px; }
+    h3 { font-size: 1.25rem; border-bottom: none; }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    table.data-table th, table.data-table td {
+      border: 1px solid #d0d7de;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background-color: #f6f8fa;
+      font-weight: 600;
+    }
+
+    pre {
+      background-color: #f6f8fa;
+      border-radius: 6px;
+      padding: 16px;
+      overflow: auto;
+      font-size: 13.5px;
+      line-height: 1.45;
+      border: 1px solid #e1e4e8;
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 85%;
+      background-color: rgba(175, 184, 193, 0.2);
+      padding: 0.2em 0.4em;
+      border-radius: 6px;
+    }
+
+    pre code {
+      background: transparent;
+      padding: 0;
+    }
+
+    .badge-pass {
+      background-color: #2da44e;
+      color: #ffffff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .print-button {
+      background-color: #0969da;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .print-button:hover {
+      background-color: #0856b5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="report-container">
+    <div class="no-print" style="text-align: right; margin-bottom: 15px;">
+      <button class="print-button" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 1h8a2 2 0 0 1 2 2v2H2V3a2 2 0 0 1 2-2zm10 5H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v1a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-1h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm-4 7H6v-3h4v3z"/>
+        </svg>
+        Print / Save as PDF (Cover Page + Report)
+      </button>
+    </div>
+
+    <!-- COVER PAGE (Exactly matching LPU template & user specification) -->
+    <div class="cover-page">
+      <div class="cover-course-header">CSE476: AGENTIC AI</div>
+      <div class="cover-semester">(Project Semester August 2026 - January 2027)</div>
+
+      <!-- LPU Emblem & Typography Branding -->
+      <div class="lpu-branding">
+        <svg class="lpu-seal" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="56" fill="none" stroke="#222" stroke-width="2.5"/>
+          <circle cx="60" cy="60" r="48" fill="none" stroke="#222" stroke-width="1.2"/>
+          <circle cx="60" cy="60" r="38" fill="#f37023"/>
+          <g stroke="#111" stroke-width="3">
+            <line x1="60" y1="60" x2="32" y2="42" />
+            <line x1="60" y1="60" x2="42" y2="30" />
+            <line x1="60" y1="60" x2="56" y2="23" />
+            <line x1="60" y1="60" x2="70" y2="24" />
+            <line x1="60" y1="60" x2="82" y2="34" />
+            <line x1="60" y1="60" x2="90" y2="48" />
+            <line x1="60" y1="60" x2="88" y2="65" />
+          </g>
+          <path id="curveTop" d="M 18,60 A 42,42 0 0,1 102,60" fill="none"/>
+          <path id="curveBot" d="M 22,62 A 42,42 0 0,0 98,62" fill="none"/>
+          <text font-size="7.5" font-family="'Times New Roman', serif" font-weight="bold" fill="#222" letter-spacing="1.2">
+            <textPath href="#curveTop" startOffset="50%" text-anchor="middle">LOVELY PROFESSIONAL UNIVERSITY</textPath>
+          </text>
+          <text font-size="7.5" font-family="'Times New Roman', serif" font-weight="bold" fill="#222" letter-spacing="1.5">
+            <textPath href="#curveBot" startOffset="50%" text-anchor="middle">PUNJAB (INDIA)</textPath>
+          </text>
+        </svg>
+
+        <div class="lpu-text-blocks">
+          <div class="lpu-row">
+            <span class="lpu-box">L</span>
+            <span class="lpu-rest">OVELY</span>
+          </div>
+          <div class="lpu-row">
+            <span class="lpu-box">P</span>
+            <span class="lpu-rest">ROFESSIONAL</span>
+          </div>
+          <div class="lpu-row">
+            <span class="lpu-box">U</span>
+            <span class="lpu-rest">NIVERSITY</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Project Title -->
+      <div class="cover-title">JANSAHAYAK: MULTILINGUAL GOVERNMENT SCHEME ELIGIBILITY GUIDE</div>
+      <div class="cover-subtitle">A Framework-Based Multi-Agent Welfare Eligibility &amp; Document Guidance System</div>
+
+      <div class="cover-submitted-label">Submitted by</div>
+
+      <!-- Team Members Table -->
+      <table class="student-table">
+        <thead>
+          <tr>
+            <th style="width: 12%; text-align: center;">S.No.</th>
+            <th>Student Name</th>
+            <th style="width: 28%; text-align: center;">Registration No.</th>
+            <th style="width: 16%; text-align: center;">Roll No.</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="text-align: center; font-weight: bold;">1</td>
+            <td style="font-weight: bold;">Sudeep Kumar Reddy Eaga</td>
+            <td style="text-align: center; font-weight: bold;">12318529</td>
+            <td style="text-align: center; font-weight: bold;">23</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;">2</td>
+            <td>Kanithi Naresh Kumar</td>
+            <td style="text-align: center;">12313053</td>
+            <td style="text-align: center; color: #777;">—</td>
+          </tr>
+          <tr>
+            <td style="text-align: center;">3</td>
+            <td>Seepana Jyothi Swaroop</td>
+            <td style="text-align: center;">12310991</td>
+            <td style="text-align: center; color: #777;">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cover-metadata"><strong>Section:</strong> K3E2327</div>
+      <div class="cover-metadata" style="margin-bottom: 22px;"><strong>Course Code:</strong> CSE476</div>
+
+      <div class="cover-guide-title">Under the Guidance of</div>
+      <div class="cover-guide-name">Mr. Ravneet Singh</div>
+      <div class="cover-guide-id">35120</div>
+
+      <div class="cover-footer">
+        Discipline of CSE/IT<br>
+        Lovely School of Computer Science and Engineering<br>
+        Lovely Professional University, Phagwara
+      </div>
+    </div>
+
+    <!-- DOCUMENT BODY (PAGE 2+) -->
+    <div class="page-break"></div>
+
+    <h1>Comprehensive Technical Documentation &amp; Implementation Guide</h1>
+
+    <p><strong>GitHub Repository:</strong> <a href="https://github.com/SudeepReddyEaga/JanSahayak" target="_blank">https://github.com/SudeepReddyEaga/JanSahayak</a><br>
+    <strong>Subject:</strong> CSE476: Agentic AI / Multi-Agent Systems<br>
+    <strong>Evaluation Target:</strong> CO3 and CO4 (Bloom's Cognitive Levels L4, L5, L6 &middot; 30 Marks)</p>
+
+    <hr>
+
+    <h2>1. Executive Summary &amp; Problem Statement</h2>
+    <p>
+      In India, welfare programs are distributed across dozens of disparate central ministries and state departments. Citizens attempting to assess their welfare eligibility face severe friction due to language barriers, technical bureaucratic jargon, and complex multi-conditional eligibility thresholds.
+    </p>
+    <p>
+      <strong>JanSahayak</strong> automates the welfare evaluation workflow through a sequential pipeline of 6 specialized agents orchestrated with the <strong>Microsoft Agent Framework</strong>. The system provides:
+    </p>
+    <ul>
+      <li><strong>Multilingual Voice &amp; Text Processing:</strong> Real-time STT and speech synthesis across 12 Indian languages, with Indic numeral normalization and Urdu RTL support.</li>
+      <li><strong>Hybrid BM25 + Vector RAG:</strong> Dual-tier lexical and dense trigram retrieval over 17 seeded Indian welfare programs.</li>
+      <li><strong>Deterministic Strategy Engine:</strong> Zero-hallucination mathematical rule evaluation ensuring strict demographic eligibility boundary compliance.</li>
+      <li><strong>GroundingGate Verification:</strong> Cryptographically verified citation tracking guaranteeing every declared benefit originates in official gazettes.</li>
+      <li><strong>Language Consistency Reviewer:</strong> Quality assurance agent that verifies native vernacular syntax while ensuring official scheme names remain intact verbatim.</li>
+      <li><strong>Two-Tier Redis Caching:</strong> Profile-guarded exact and semantic vector caching delivering sub-5ms latency with zero cross-profile demographic contamination.</li>
+    </ul>
+
+    <h2>2. Course Outcomes (CO3 &amp; CO4) Compliance</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Outcome</th>
+          <th>Curriculum Definition</th>
+          <th>JanSahayak Concrete Implementation</th>
+          <th>Bloom's Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>CO3</strong></td>
+          <td>Design and build collaborative multi-agent architectures using modern agent frameworks with shared context and grounded retrieval.</td>
+          <td>Implemented 6 specialized agents wired via Microsoft Agent Framework <code>SequentialBuilder</code> reading/writing to <code>UserProfileMemoryContextProvider</code> with Hybrid BM25+Vector RAG.</td>
+          <td><strong>L4 &amp; L6</strong></td>
+        </tr>
+        <tr>
+          <td><strong>CO4</strong></td>
+          <td>Evaluate multi-agent systems against quantitative precision, recall, and grounding metrics across diverse benchmarks.</td>
+          <td>Evaluated across 10 multilingual citizen profiles in 7 languages, achieving 100% Macro/Micro Precision, 100% Recall, 100% Grounding Pass Rate, and 100% Scheme Name Integrity.</td>
+          <td><strong>L5</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>3. Microservice Topology &amp; Port Allocation</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Service Name</th>
+          <th>Port</th>
+          <th>Directory</th>
+          <th>Function</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>frontend-ui</code></td><td>3000</td><td><code>services/frontend_ui/</code></td><td>Nginx-hosted Single Page Application with Web Speech API integration.</td></tr>
+        <tr><td><code>api-gateway</code></td><td>8000</td><td><code>services/api_gateway/</code></td><td>Edge reverse proxy, Redis cache-aside orchestrator, and SSE streaming gateway.</td></tr>
+        <tr><td><code>profile-memory-service</code></td><td>8001</td><td><code>services/profile_memory_service/</code></td><td>Session state store, demographic repository, and evaluation run recorder.</td></tr>
+        <tr><td><code>rag-retrieval-service</code></td><td>8002</td><td><code>services/rag_retrieval_service/</code></td><td>Hybrid BM25 + Dense Trigram vector search engine over 17 welfare schemes.</td></tr>
+        <tr><td><code>agent-orchestrator-service</code></td><td>8003</td><td><code>services/agent_orchestrator_service/</code></td><td>Microsoft Agent Framework sequential pipeline engine &amp; 10-profile evaluator.</td></tr>
+        <tr><td><code>voice-speech-service</code></td><td>8004</td><td><code>services/voice_speech_service/</code></td><td>12 BCP-47 speech locale registry and markdown-to-speech sanitizer.</td></tr>
+        <tr><td><code>postgres</code></td><td>5432</td><td>Container</td><td>PostgreSQL 16 relational database with JSONB indexing.</td></tr>
+        <tr><td><code>redis</code></td><td>6379</td><td>Container</td><td>Redis 7 in-memory store for exact and semantic query caches.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>4. 10-Profile Precision &amp; Recall Benchmark Results</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Lang</th>
+          <th>Profile Description</th>
+          <th>Expected Schemes</th>
+          <th>Predicted Schemes</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>Grounding</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>P01</strong></td><td><code>hi</code></td><td>Elderly Rural Small Farmer (BPL, 2 Acres, No Pucca House)</td><td>PM-KISAN, PMFBY, PMAY-G, AB-PMJAY, IGNOAPS, MGNREGA</td><td>PMAY-G, IGNOAPS, PM-KISAN, AB-PMJAY, PMFBY, MGNREGA</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P02</strong></td><td><code>te</code></td><td>Rural Widowed Woman Laborer (BPL, No LPG, No Pucca House)</td><td>PMAY-G, AB-PMJAY, PMUY, IGNWPS, MGNREGA</td><td>PMAY-G, MGNREGA, PMUY, IGNWPS, AB-PMJAY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P03</strong></td><td><code>en</code></td><td>Urban OBC Undergraduate Engineering Student</td><td>AB-PMJAY, NSP-PMS, PM-YASASVI</td><td>NSP-PMS, PM-YASASVI, AB-PMJAY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P04</strong></td><td><code>ta</code></td><td>Rural Pregnant Woman (SC, Low Income, No LPG)</td><td>AB-PMJAY, PMUY, PMMVY, MGNREGA</td><td>PMUY, MGNREGA, PMMVY, AB-PMJAY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P05</strong></td><td><code>bn</code></td><td>Urban Street Vendor (Hawker, Income 1.8L)</td><td>AB-PMJAY, PM-SVANIDHI, PMMY</td><td>PM-SVANIDHI, AB-PMJAY, PMMY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P06</strong></td><td><code>mr</code></td><td>Rural Potter Artisan (No Pucca House, Non-Govt)</td><td>PMAY-G, AB-PMJAY, PM-VISHWAKARMA, PMMY, MGNREGA</td><td>PMAY-G, PM-VISHWAKARMA, MGNREGA, AB-PMJAY, PMMY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P07</strong></td><td><code>kn</code></td><td>Rural Citizen with 85% Disability (BPL, Unemployed)</td><td>PMAY-G, AB-PMJAY, IGNDPS, ADIP-DIVYANG, MGNREGA</td><td>MGNREGA, PMAY-G, ADIP-DIVYANG, IGNDPS, AB-PMJAY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P08</strong></td><td><code>en</code></td><td>Urban Small Business Parent with 6yo Girl Child</td><td>PMMY, SSY</td><td>SSY, PMMY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P09</strong></td><td><code>hi</code></td><td>Urban Senior Citizen 74yo (Non-BPL, Income 3.2L)</td><td>AB-PMJAY</td><td>AB-PMJAY</td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+        <tr><td><strong>P10</strong></td><td><code>en</code></td><td>High-Income Urban Govt Employee (Negative Control)</td><td><em>(None)</em></td><td><em>(None)</em></td><td>1.00</td><td>1.00</td><td><span class="badge-pass">PASS</span></td></tr>
+      </tbody>
+    </table>
+
+    <div style="background-color: #f6f8fa; border: 1px solid #d0d7de; border-radius: 6px; padding: 15px; margin: 20px 0;">
+      <strong>Aggregated Benchmark Statistics:</strong><br>
+      &bull; <strong>Macro Precision:</strong> 1.0000 (100.0%) &nbsp;|&nbsp; <strong>Macro Recall:</strong> 1.0000 (100.0%) &nbsp;|&nbsp; <strong>Macro F1:</strong> 1.0000 (100.0%)<br>
+      &bull; <strong>Micro Precision:</strong> 1.0000 (100.0%) &nbsp;|&nbsp; <strong>Micro Recall:</strong> 1.0000 (100.0%) &nbsp;|&nbsp; <strong>Micro F1:</strong> 1.0000 (100.0%)<br>
+      &bull; <strong>GroundingGate Pass Rate:</strong> 100.0% &nbsp;|&nbsp; <strong>Language Match:</strong> 100.0% &nbsp;|&nbsp; <strong>Scheme Name Preservation:</strong> 100.0%
+    </div>
+
+    <h2>5. Quick Start &amp; Deployment Guide</h2>
+    <h3>Option A: Multi-Container Microservice Stack (Docker Compose)</h3>
+    <pre><code># 1. Clone repository
+git clone https://github.com/SudeepReddyEaga/JanSahayak.git
+cd JanSahayak
+
+# 2. Configure environment
+cp .env.example .env
+
+# 3. Build and launch all 8 services
+docker compose up --build -d
+
+# 4. Access Web UI at http://localhost:3000 or http://localhost:8000</code></pre>
+
+    <h3>Option B: Automated Test Suite Verification</h3>
+    <pre><code># Execute the full 19-test automated suite (including 10-profile benchmark & live microservices cluster)
+pytest -v</code></pre>
+
+    <p style="text-align: center; color: #666; font-size: 13px; margin-top: 40px; border-top: 1px solid #e1e4e8; padding-top: 15px;">
+      JanSahayak Multi-Agent System &middot; Academic Year 2026&ndash;2027 &middot; Lovely Professional University
+    </p>
+  </div>
+
+</body>
+</html>
