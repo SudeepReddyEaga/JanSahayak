@@ -737,6 +737,30 @@ The `voice-speech-service` (running on `:8004`) decouples speech processing from
 2. **Markdown Speech Sanitization:** Raw AI responses contain markdown tables, emojis, hashtags, links, and bold asterisks that degrade speech synthesis. The endpoint `POST /api/v1/voice/sanitize-speech` strips markdown markup, converts Roman numerals to words, and partitions long replies into natural sentence boundaries.
 3. **Text-to-Speech (TTS):** The `CitizenVoiceController` uses `window.speechSynthesis` with speech rate and pitch compensation, dynamically selecting the highest-fidelity local voice matching the target BCP-47 locale.
 
+### 6.4. Dynamic Full-Page Multilingual Localization & Live Audio Waveform Equalizer
+When a citizen selects or speaks in any of the 12 supported languages (or when script auto-detection triggers), the UI controller (`ui_translations.js`) dynamically translates **every single visual element** on the page in real-time without requiring a page reload:
+- **Navigation & Brand:** Header title, subtitle, microservice telemetry badges, and all primary tab button labels (`tabBtnAssistant`, `tabBtnMemory`, `tabBtnEvaluation`, `tabBtnKbCache`).
+- **Input & Dictation Dock:** Card titles, multilingual sample profile chips, language selector options, cache bypass toggle, microphone labels (`voice_btn_idle` / `voice_btn_listening`), voice status hints, and textarea placeholder text in native typography.
+- **Structured Profile Overrides:** Demographic fields (Age, Annual Income, Gender, Occupation, Residence, Category, BPL Card, Pucca House) and option labels.
+- **Live 6-Agent Sequential Pipeline Stepper:** Step titles, agent responsibilities, and execution status pills (`Waiting`, `Running...`, `Completed`).
+- **Interactive Multi-Turn Conversation Thread:** Chat history header, empty-state instructions, and 1-click demographic follow-up clarification chips.
+- **Results & Document Readiness:** Verified guide title, TTS controls (`Listen Aloud`, `Pause`, `Resume`, `Stop`, `Copy`, `Download .txt`), extracted profile badges, document readiness progress bar (`X / Y Ready`), and policy headers.
+- **Urdu Right-to-Left (RTL) Layout:** Automatically applies `dir="rtl"` across the document root, body, textarea, and scheme card flex containers with `Noto Nastaliq Urdu` typography.
+- **Live Audio Wave Equalizer:** Integrated 6-bar animated audio equalizer in the voice dock that dynamically pulsates (`waveBounce` keyframes) during microphone input (STT) and voice read-aloud playback (TTS).
+
+### 6.5. Scheme Data Analytics & Visual KPI Matrix
+To provide immediate visual clarity to citizens and evaluators, each scheme card features an interactive data visualization dashboard (`scheme_metrics.js`):
+1. **SVG Radial Match Gauge:** Dynamic SVG circular progress ring displaying exact rule compliance percentage (100% for eligible, 75% for potential/pending, 35% for excluded candidates).
+2. **Financial Value KPI Pill:** Saffron, emerald, and sapphire gradient badges highlighting the scheme's statutory monetary benefit (e.g., `₹6,000 / yr` for PM-KISAN, `₹5,00,000 / yr` for AB-PMJAY, `₹1,20,000` for PMAY-G, `₹3,00,000 @ 5%` for PM-Vishwakarma).
+3. **RAG Semantic Grounding Badge:** Displays retrieval confidence and citation verification percentage.
+4. **4-Dimension Comparative Progress Analytics Bars:**
+   - **🎯 Eligibility Alignment:** Quantitative rule pass ratio.
+   - **💰 Financial Assistance Index:** Scaled sovereign benefit magnitude.
+   - **⚡ Application Process Ease:** Metric based on online e-KYC vs. in-person physical inspections.
+   - **📄 Document Simplicity:** Inverse document burden metric based on required official certificates.
+5. **Interactive Sector Filter Toolbar:** One-click filter pills above the schemes grid (`All Categories`, `🌾 Agriculture`, `🏥 Healthcare`, `🏠 Housing`, `💼 Loans & MSME`, `👵 Pensions`, `👩 Women & Child`, `🛡️ Insurance`) with smooth CSS fade transitions.
+6. **Direct Official Government Portal Links:** Explicit `.gov.in` and `.nic.in` portal buttons (`🌐 Official Site →` and `🌐 Official Portal →`) provided for both matched and non-matched welfare schemes.
+
 ---
 
 ## 7. Relational Database & Redis Cache System Design

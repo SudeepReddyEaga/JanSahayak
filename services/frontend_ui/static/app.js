@@ -112,6 +112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderSampleChips();
   bindTabEvents();
   bindActionButtons();
+  bindCategoryFilterButtons();
   updateLanguageDirectionAndLocale();
   refreshHealthStatus();
   loadSchemesCatalog();
@@ -137,6 +138,11 @@ function initVoiceController() {
       const playBtn = document.getElementById("ttsPlayBtn");
       const pauseBtn = document.getElementById("ttsPauseBtn");
       const stopBtn = document.getElementById("ttsStopBtn");
+      const waveBox = document.getElementById("voiceWaveBox");
+
+      if (waveBox) {
+        waveBox.classList.toggle("wave-active", Boolean(state.isListening || state.isSpeaking));
+      }
 
       if (!state.canListen) {
         micBtn.disabled = true;
@@ -144,7 +150,9 @@ function initVoiceController() {
       } else {
         micBtn.disabled = false;
         micBtn.classList.toggle("listening", state.isListening);
-        micLabel.textContent = state.isListening ? "Stop Listening" : "Speak in Selected Language";
+        const selLang = document.getElementById("languageSelect").value || "en";
+        const tr = (k) => (window.t ? window.t(k, selLang) : k);
+        micLabel.textContent = state.isListening ? tr("voice_btn_listening") : tr("voice_btn_idle");
       }
 
       if (state.message && (state.code.startsWith("stt") || state.code === "listening" || state.code === "idle")) {
@@ -169,13 +177,199 @@ function initVoiceController() {
   voiceController.loadLocales().then(() => updateLanguageDirectionAndLocale());
 }
 
-function updateLanguageDirectionAndLocale() {
-  const selectedLang = document.getElementById("languageSelect").value || "en";
-  const spec = voiceController ? voiceController.getLocaleSpec(selectedLang) : { bcp47_tag: `${selectedLang}-IN`, rtl: selectedLang === "ur" };
-  document.getElementById("voiceLocalePill").textContent = spec.bcp47_tag;
+function updateLanguageDirectionAndLocale(optLang) {
+  const selectedLang = optLang || document.getElementById("languageSelect").value || "en";
+  applyLanguageLocalization(selectedLang);
+}
 
-  const queryEl = document.getElementById("citizenQuery");
-  queryEl.dir = spec.rtl ? "rtl" : "ltr";
+function applyLanguageLocalization(langCode) {
+  const lang = langCode || "en";
+  const tr = (k) => (window.t ? window.t(k, lang) : k);
+  const spec = voiceController ? voiceController.getLocaleSpec(lang) : { bcp47_tag: `${lang}-IN`, rtl: lang === "ur" };
+
+  // Set RTL or LTR on document root and body
+  document.documentElement.dir = spec.rtl ? "rtl" : "ltr";
+  document.documentElement.lang = lang;
+  document.body.dir = spec.rtl ? "rtl" : "ltr";
+
+  // Topbar Brand
+  const bH = document.getElementById("brandHeading");
+  if (bH) bH.textContent = tr("brand_title");
+  const bS = document.getElementById("brandSubtitle");
+  if (bS) bS.textContent = tr("brand_subtitle");
+
+  // Health strip
+  const hP = document.getElementById("healthPill");
+  if (hP && hP.textContent.includes("Healthy")) hP.textContent = tr("health_healthy");
+
+  // Navigation Tabs
+  const tA = document.getElementById("tabBtnAssistant");
+  if (tA) tA.textContent = tr("tab_assistant");
+  const tM = document.getElementById("tabBtnMemory");
+  if (tM) tM.textContent = tr("tab_memory");
+  const tE = document.getElementById("tabBtnEvaluation");
+  if (tE) tE.textContent = tr("tab_evaluation");
+  const tK = document.getElementById("tabBtnKbCache");
+  if (tK) tK.textContent = tr("tab_kb_cache");
+
+  // Intake Card Header & Badges
+  const cT = document.getElementById("cardIntakeTitle");
+  if (cT) cT.textContent = tr("card_intake_title");
+  const sL = document.getElementById("samplesLabel");
+  if (sL) sL.textContent = tr("samples_label");
+  const lSL = document.getElementById("langSelectLabel");
+  if (lSL) lSL.textContent = tr("language_select_label");
+  const aDO = document.getElementById("autoDetectOpt");
+  if (aDO) aDO.textContent = tr("auto_detect_opt");
+  const bCL = document.getElementById("bypassCacheLabel");
+  if (bCL) bCL.textContent = tr("bypass_cache_label");
+
+  // Voice dock
+  const vMB = document.getElementById("voiceMicBtnLabel");
+  if (vMB && (!voiceController || !voiceController.isListening)) vMB.textContent = tr("voice_btn_idle");
+  const vLP = document.getElementById("voiceLocalePill");
+  if (vLP) vLP.textContent = spec.bcp47_tag;
+  const aSL = document.getElementById("autoSendLabel");
+  if (aSL) aSL.textContent = tr("voice_auto_send");
+  const aRL = document.getElementById("autoReadLabel");
+  if (aRL) aRL.textContent = tr("voice_auto_read");
+  const vST = document.getElementById("voiceStatusText");
+  if (vST) vST.textContent = tr("voice_status_ready");
+
+  // Form Fields & Placeholder
+  const dL = document.getElementById("describeLabel");
+  if (dL) dL.textContent = tr("describe_label");
+  const cIB = document.getElementById("clearInputBtn");
+  if (cIB) cIB.textContent = tr("clear_btn");
+  const cQ = document.getElementById("citizenQuery");
+  if (cQ) {
+    cQ.placeholder = tr("textarea_placeholder");
+    cQ.dir = spec.rtl ? "rtl" : "ltr";
+  }
+
+  // Structured Overrides
+  const oS = document.getElementById("overridesSummary");
+  if (oS) oS.textContent = tr("overrides_summary");
+  const oAge = document.getElementById("lblOvrAge");
+  if (oAge) oAge.textContent = tr("ovr_age");
+  const oInc = document.getElementById("lblOvrIncome");
+  if (oInc) oInc.textContent = tr("ovr_income");
+  const oGen = document.getElementById("lblOvrGender");
+  if (oGen) oGen.textContent = tr("ovr_gender");
+  const oOcc = document.getElementById("lblOvrOccupation");
+  if (oOcc) oOcc.textContent = tr("ovr_occupation");
+  const oRes = document.getElementById("lblOvrResidence");
+  if (oRes) oRes.textContent = tr("ovr_residence");
+  const oCat = document.getElementById("lblOvrCategory");
+  if (oCat) oCat.textContent = tr("ovr_category");
+  const oBpl = document.getElementById("lblOvrBpl");
+  if (oBpl) oBpl.textContent = tr("ovr_bpl");
+  const oPuc = document.getElementById("lblOvrPucca");
+  if (oPuc) oPuc.textContent = tr("ovr_pucca");
+
+  // Action Buttons
+  const sQB = document.getElementById("submitQueryBtn");
+  if (sQB) sQB.textContent = tr("submit_btn");
+  const nSB = document.getElementById("newSessionBtn");
+  if (nSB) nSB.textContent = tr("new_session_btn");
+  const tPB = document.getElementById("testParaphraseBtn");
+  if (tPB) tPB.textContent = tr("demo_cache_btn");
+
+  // Sequential Pipeline Stepper
+  const pT = document.getElementById("pipelineTitle");
+  if (pT) pT.textContent = tr("pipeline_title");
+  const steps = [
+    { num: 1, name: "step1_name", desc: "step1_desc" },
+    { num: 2, name: "step2_name", desc: "step2_desc" },
+    { num: 3, name: "step3_name", desc: "step3_desc" },
+    { num: 4, name: "step4_name", desc: "step4_desc" },
+    { num: 5, name: "step5_name", desc: "step5_desc" },
+    { num: 6, name: "step6_name", desc: "step6_desc" },
+  ];
+  steps.forEach((st) => {
+    const card = document.querySelector(`.step-card:nth-child(${st.num})`);
+    if (card) {
+      const nameEl = card.querySelector(".step-name");
+      if (nameEl) nameEl.textContent = tr(st.name);
+      const descEl = card.querySelector(".step-desc");
+      if (descEl) descEl.textContent = tr(st.desc);
+    }
+  });
+
+  // Conversation Thread
+  const cTT = document.getElementById("chatThreadTitle");
+  if (cTT) cTT.textContent = tr("chat_thread_title");
+  const cEH = document.getElementById("chatEmptyHint");
+  if (cEH) cEH.textContent = tr("chat_empty_hint");
+  const qFT = document.getElementById("quickFollowupsTitle");
+  if (qFT) qFT.textContent = tr("quick_followups_title");
+
+  // Results Section
+  const gFT = document.getElementById("guideFinalTitle");
+  if (gFT) gFT.textContent = tr("guide_final_title");
+  const tPB2 = document.getElementById("ttsPlayBtn");
+  if (tPB2) tPB2.textContent = tr("tts_listen");
+  const tPau = document.getElementById("ttsPauseBtn");
+  if (tPau && (!voiceController || !voiceController.isPaused)) tPau.textContent = tr("tts_pause");
+  const tSto = document.getElementById("ttsStopBtn");
+  if (tSto) tSto.textContent = tr("tts_stop");
+  const cGB = document.getElementById("copyGuideBtn");
+  if (cGB) cGB.textContent = tr("btn_copy");
+  const dGB = document.getElementById("downloadGuideBtn");
+  if (dGB) dGB.textContent = tr("btn_download");
+
+  const ePT = document.getElementById("extractedProfileTitle");
+  if (ePT) ePT.textContent = tr("extracted_profile_title");
+  const dRH = document.getElementById("docReadinessHeading");
+  if (dRH) dRH.textContent = tr("doc_readiness_title");
+
+  const eST = document.getElementById("eligibleSchemesTitle");
+  if (eST) eST.textContent = tr("eligible_schemes_title");
+  const pST = document.getElementById("potentialSchemesTitle");
+  if (pST) pST.textContent = tr("potential_schemes_title");
+  const iST = document.getElementById("ineligibleSchemesTitle");
+  if (iST) iST.textContent = tr("ineligible_schemes_title");
+
+  // Category Filter Buttons
+  const fAll = document.getElementById("filterAllBtn");
+  if (fAll) fAll.textContent = tr("filter_all");
+  const fAgri = document.getElementById("filterAgriBtn");
+  if (fAgri) fAgri.textContent = tr("filter_agri");
+  const fHealth = document.getElementById("filterHealthBtn");
+  if (fHealth) fHealth.textContent = tr("filter_health");
+  const fHousing = document.getElementById("filterHousingBtn");
+  if (fHousing) fHousing.textContent = tr("filter_housing");
+  const fMsme = document.getElementById("filterMsmeBtn");
+  if (fMsme) fMsme.textContent = tr("filter_msme");
+  const fPension = document.getElementById("filterPensionBtn");
+  if (fPension) fPension.textContent = tr("filter_pension");
+  const fWomen = document.getElementById("filterWomenBtn");
+  if (fWomen) fWomen.textContent = tr("filter_women");
+  const fIns = document.getElementById("filterInsuranceBtn");
+  if (fIns) fIns.textContent = tr("filter_insurance");
+}
+
+function bindCategoryFilterButtons() {
+  document.querySelectorAll("#schemeFilterToolbar .cat-filter-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#schemeFilterToolbar .cat-filter-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const targetCat = btn.dataset.cat;
+      filterEligibleSchemes(targetCat);
+    });
+  });
+}
+
+function filterEligibleSchemes(cat) {
+  const cards = document.querySelectorAll("#eligibleSchemesGrid .scheme-card");
+  cards.forEach((c) => {
+    if (cat === "all" || c.dataset.category === cat) {
+      c.style.display = "";
+      c.style.animation = "fadeInUp 0.3s ease";
+    } else {
+      c.style.display = "none";
+    }
+  });
 }
 
 function bindTabEvents() {
@@ -227,7 +421,12 @@ function bindActionButtons() {
     }
   });
 
-  document.getElementById("languageSelect").addEventListener("change", updateLanguageDirectionAndLocale);
+  document.getElementById("languageSelect").addEventListener("change", () => {
+    updateLanguageDirectionAndLocale();
+    if (latestGuideResponse) {
+      renderGuideResponse(latestGuideResponse);
+    }
+  });
   document.getElementById("clearInputBtn").addEventListener("click", () => {
     document.getElementById("citizenQuery").value = "";
   });
@@ -548,27 +747,44 @@ function renderCompleteGuide(data) {
   });
   updateDocumentReadiness();
 
-  // Eligible Schemes Cards with Per-Scheme "Read Aloud" Button
+  // Automatically apply complete UI localization into the detected citizen language
+  applyLanguageLocalization(data.detected_language);
+
+  // Eligible Schemes Cards with Per-Scheme "Read Aloud" Button and Visual Analytics Matrix
   const eligible = data.eligible_schemes || [];
   document.getElementById("eligibleCountBadge").textContent = `${eligible.length} Eligible`;
   const grid = document.getElementById("eligibleSchemesGrid");
+  const tr = (k) => (window.t ? window.t(k, data.detected_language) : k);
+
   grid.innerHTML = eligible.length
     ? eligible
         .map(
-          (s, idx) => `
-      <div class="scheme-card">
+          (s, idx) => {
+            const meta = window.getSchemeMetrics ? window.getSchemeMetrics(s.scheme_id) : { category: "general", color: "#10b981", category_name: "General" };
+            const metricsHTML = window.buildSchemeMetricsHTML ? window.buildSchemeMetricsHTML(s, data.detected_language, 100) : "";
+            return `
+      <div class="scheme-card" data-category="${meta.category}" style="border-top: 4px solid ${meta.color};">
         <div class="scheme-header-row">
-          <h3>${escapeHtml(s.official_name)}</h3>
+          <div>
+            <span class="badge" style="background: ${meta.color}20; color: ${meta.color}; font-weight:700; margin-bottom:5px; display:inline-block;">
+              ${escapeHtml(meta.category_name || s.ministry)}
+            </span>
+            <h3 style="margin:2px 0 6px;">${escapeHtml(s.official_name)}</h3>
+          </div>
           <div style="display:flex; gap:6px; align-items:center;">
-            <button type="button" class="btn btn-secondary btn-sm speak-scheme-btn" data-scheme-idx="${idx}" title="Read this scheme aloud">Speak</button>
-            ${s.official_portal ? `<a href="${s.official_portal}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none;" title="Go directly to official portal">🌐 Official Site &rarr;</a>` : ""}
+            <button type="button" class="btn btn-secondary btn-sm speak-scheme-btn" data-scheme-idx="${idx}" title="Read this scheme aloud">${tr('speak_scheme_btn')}</button>
+            ${s.official_portal ? `<a href="${s.official_portal}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none;" title="Go directly to official portal">${tr('official_site_btn')}</a>` : ""}
           </div>
         </div>
         <div class="scheme-meta">${escapeHtml(s.ministry)} · RAG Score: ${s.rag_score.toFixed(2)}</div>
-        <p><strong>Benefit:</strong> ${escapeHtml(s.localized_benefit_summary || s.benefit_summary)}</p>
-        <p><strong>Why Qualified:</strong> ${escapeHtml(s.localized_reason || s.reason)}</p>
-        <details>
-          <summary>Rule Checks (${s.passed_rules.length} Passed) &amp; Application Steps</summary>
+
+        <!-- Interactive Visual Analytics Matrix (Radial Gauge, KPIs & Comparative Bars) -->
+        ${metricsHTML}
+
+        <p style="margin-top:12px;"><strong>${tr('benefit_label')}</strong> ${escapeHtml(s.localized_benefit_summary || s.benefit_summary)}</p>
+        <p><strong>${tr('why_qualified_label')}</strong> ${escapeHtml(s.localized_reason || s.reason)}</p>
+        <details style="margin-top:10px;">
+          <summary>${tr('rules_and_steps_summary')} (${s.passed_rules.length} Passed)</summary>
           <ul class="rule-list">
             ${s.passed_rules.map((pr) => `<li>✓ <b>${escapeHtml(pr.field)}</b>=${escapeHtml(String(pr.actual_value))} — ${escapeHtml(pr.description)}</li>`).join("")}
           </ul>
@@ -579,10 +795,11 @@ function renderCompleteGuide(data) {
             Official Portal: <a href="${s.official_portal}" target="_blank" rel="noopener" style="font-weight:600; color:var(--primary);">${s.official_portal}</a> · Helpline: ${escapeHtml(s.helpline)}
           </div>
         </details>
-      </div>`
+      </div>`;
+          }
         )
         .join("")
-    : `<p class="muted">No schemes matched all statutory eligibility rules for this citizen profile.</p>`;
+    : `<p class="muted">${tr('no_eligible_schemes')}</p>`;
 
   grid.querySelectorAll(".speak-scheme-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -593,22 +810,27 @@ function renderCompleteGuide(data) {
     });
   });
 
-  // Potential & Ineligible Cards with Direct Official Portal Links
+  // Potential & Ineligible Cards with Direct Official Portal Links and Visual Metrics
   const potential = data.potential_schemes || [];
   document.getElementById("potentialCountBadge").textContent = potential.length;
   document.getElementById("potentialSchemesBox").innerHTML = potential.length
     ? potential
         .map(
-          (p) =>
-            `<div class="session-item" style="display:flex; flex-direction:column; gap:6px;">
+          (p) => {
+            const meta = window.getSchemeMetrics ? window.getSchemeMetrics(p.scheme_id) : { color: "#f59e0b" };
+            const metricsHTML = window.buildSchemeMetricsHTML ? window.buildSchemeMetricsHTML(p, data.detected_language, 75) : "";
+            return `
+            <div class="session-item" style="display:flex; flex-direction:column; gap:8px; border-left: 3px solid #f59e0b;">
                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                  <strong>${escapeHtml(p.official_name)}</strong>
-                 ${p.official_portal ? `<a href="${p.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none; white-space:nowrap;">🌐 Official Portal</a>` : ""}
+                 ${p.official_portal ? `<a href="${p.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none; white-space:nowrap;">${tr('official_portal_btn')}</a>` : ""}
                </div>
+               ${metricsHTML}
                <div class="muted">${escapeHtml(p.localized_reason || p.reason)}</div>
-               ${p.missing_fields && p.missing_fields.length ? `<div style="font-size:11.5px; color:#c2410c;">Pending confirmation: ${escapeHtml(p.missing_fields.join(", "))}</div>` : ""}
-               ${p.official_portal ? `<div style="font-size:11px;"><a href="${p.official_portal}" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">Learn more &amp; verify requirements on official portal &rarr;</a></div>` : ""}
-             </div>`
+               ${p.missing_fields && p.missing_fields.length ? `<div style="font-size:11.5px; color:#c2410c; font-weight:600;">Pending confirmation: ${escapeHtml(p.missing_fields.join(", "))}</div>` : ""}
+               ${p.official_portal ? `<div style="font-size:11px;"><a href="${p.official_portal}" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">${tr('learn_more_link')}</a></div>` : ""}
+             </div>`;
+          }
         )
         .join("")
     : `<p class="muted">No ambiguous/pending schemes.</p>`;
@@ -618,15 +840,19 @@ function renderCompleteGuide(data) {
   document.getElementById("ineligibleSchemesBox").innerHTML = ineligible.length
     ? ineligible
         .map(
-          (x) =>
-            `<div class="session-item" style="display:flex; flex-direction:column; gap:6px;">
+          (x) => {
+            const metricsHTML = window.buildSchemeMetricsHTML ? window.buildSchemeMetricsHTML(x, data.detected_language, 35) : "";
+            return `
+            <div class="session-item" style="display:flex; flex-direction:column; gap:8px; border-left: 3px solid #94a3b8;">
                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
                  <strong>${escapeHtml(x.official_name || x.scheme_id)}</strong>
-                 ${x.official_portal ? `<a href="${x.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none; white-space:nowrap;">🌐 Official Portal &rarr;</a>` : ""}
+                 ${x.official_portal ? `<a href="${x.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none; white-space:nowrap;">${tr('official_portal_btn')}</a>` : ""}
                </div>
+               ${metricsHTML}
                <div class="muted" style="font-size:12px;"><strong>Reason not matched:</strong> ${escapeHtml(x.localized_reason || x.reason)}</div>
-               ${x.official_portal ? `<div style="font-size:11px;"><a href="${x.official_portal}" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">Explore official policy criteria &amp; future guidelines at ${escapeHtml(x.official_portal)}</a></div>` : ""}
-             </div>`
+               ${x.official_portal ? `<div style="font-size:11px;"><a href="${x.official_portal}" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">${tr('learn_more_link')}</a></div>` : ""}
+             </div>`;
+          }
         )
         .join("")
     : `<p class="muted">None.</p>`;

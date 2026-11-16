@@ -20,24 +20,24 @@
         </svg>
       </div>
       <div>
-        <h1>JanSahayak · Multilingual Government Scheme Eligibility Guide</h1>
-        <p class="subtitle">
+        <h1 id="brandHeading">JanSahayak · Multilingual Government Scheme Eligibility Guide</h1>
+        <p class="subtitle" id="brandSubtitle">
           12 Indian Languages · Voice Assistant · Microsoft Agent Framework · Hybrid RAG · Redis Semantic Cache
         </p>
       </div>
     </div>
 
     <div class="health-strip" id="healthStrip">
-      <span class="pill pill-neutral">Checking microservices...</span>
+      <span class="pill pill-neutral" id="healthPill">Checking microservices...</span>
     </div>
   </header>
 
   <!-- Primary Navigation Tabs -->
   <nav class="tabs-bar">
-    <button class="tab-btn active" data-tab="assistant">1. Citizen Assistant &amp; Voice</button>
-    <button class="tab-btn" data-tab="memory">2. Shared Profile Memory &amp; Audit</button>
-    <button class="tab-btn" data-tab="evaluation">3. 10-Profile Evaluation (Precision/Recall)</button>
-    <button class="tab-btn" data-tab="kb-cache">4. Schemes KB &amp; Redis Cache</button>
+    <button class="tab-btn active" data-tab="assistant" id="tabBtnAssistant">1. Citizen Assistant &amp; Voice</button>
+    <button class="tab-btn" data-tab="memory" id="tabBtnMemory">2. Shared Profile Memory &amp; Audit</button>
+    <button class="tab-btn" data-tab="evaluation" id="tabBtnEvaluation">3. 10-Profile Evaluation (Precision/Recall)</button>
+    <button class="tab-btn" data-tab="kb-cache" id="tabBtnKbCache">4. Schemes KB &amp; Redis Cache</button>
   </nav>
 
   <main class="container">
@@ -49,22 +49,22 @@
         <!-- Left Column: Multilingual Voice & Text Input, Sample Prompts, Overrides -->
         <div class="card">
           <div class="card-header">
-            <h2>Citizen Query, Voice &amp; Profile Intake</h2>
+            <h2 id="cardIntakeTitle">Citizen Query, Voice &amp; Profile Intake</h2>
             <span class="badge badge-info" id="sessionBadge">New Session</span>
           </div>
 
           <!-- 1-Click Multilingual Sample Citizen Queries (All 12 Supported Languages) -->
           <div class="samples-box">
-            <label class="field-label">Quick Multilingual Sample Profiles (12 Languages):</label>
+            <label class="field-label" id="samplesLabel">Quick Multilingual Sample Profiles (12 Languages):</label>
             <div class="sample-chips" id="sampleChips"></div>
           </div>
 
           <!-- Language Selector & Cache Toggle -->
           <div class="form-row">
             <div class="form-group">
-              <label for="languageSelect" class="field-label">Citizen Language (Text &amp; Voice)</label>
+              <label for="languageSelect" class="field-label" id="langSelectLabel">Citizen Language (Text &amp; Voice)</label>
               <select id="languageSelect" class="input-control">
-                <option value="">Auto-Detect Script / Language</option>
+                <option value="" id="autoDetectOpt">Auto-Detect Script / Language</option>
                 <option value="en">English (en-IN)</option>
                 <option value="hi">हिन्दी — Hindi (hi-IN)</option>
                 <option value="pa">ਪੰਜਾਬੀ — Punjabi (pa-IN)</option>
@@ -82,7 +82,7 @@
             <div class="form-group checkbox-inline">
               <label class="checkbox-label">
                 <input type="checkbox" id="bypassCacheChk" />
-                <span>Bypass Redis Cache (Force Live Pipeline)</span>
+                <span id="bypassCacheLabel">Bypass Redis Cache (Force Live Pipeline)</span>
               </label>
             </div>
           </div>
@@ -95,13 +95,24 @@
                 <span id="voiceMicBtnLabel">Speak in Selected Language</span>
               </button>
               <span class="badge badge-neutral" id="voiceLocalePill">en-IN</span>
+
+              <!-- Live Audio Wave Equalizer Indicator -->
+              <div class="voice-wave-container" id="voiceWaveBox" title="Voice audio waveform indicator">
+                <div class="voice-wave-bar"></div>
+                <div class="voice-wave-bar"></div>
+                <div class="voice-wave-bar"></div>
+                <div class="voice-wave-bar"></div>
+                <div class="voice-wave-bar"></div>
+                <div class="voice-wave-bar"></div>
+              </div>
+
               <label class="checkbox-label voice-mini-chk">
                 <input type="checkbox" id="voiceAutoSendChk" />
-                <span>Auto-submit after speech</span>
+                <span id="autoSendLabel">Auto-submit after speech</span>
               </label>
               <label class="checkbox-label voice-mini-chk">
                 <input type="checkbox" id="voiceAutoReadChk" />
-                <span>Auto-read reply</span>
+                <span id="autoReadLabel">Auto-read reply</span>
               </label>
             </div>
             <div class="voice-status-line" id="voiceStatusText">
@@ -111,7 +122,7 @@
 
           <div class="form-group">
             <div class="label-split">
-              <label for="citizenQuery" class="field-label">Describe your situation (Type or Dictate · Ctrl+Enter to Send)</label>
+              <label for="citizenQuery" class="field-label" id="describeLabel">Describe your situation (Type or Dictate · Ctrl+Enter to Send)</label>
               <button type="button" id="clearInputBtn" class="link-btn">Clear</button>
             </div>
             <textarea
@@ -124,10 +135,10 @@
 
           <!-- Collapsible Optional Structured Profile Overrides -->
           <details class="override-drawer">
-            <summary>Optional Structured Profile Overrides (Interactive Form)</summary>
+            <summary id="overridesSummary">Optional Structured Profile Overrides (Interactive Form)</summary>
             <div class="override-grid">
               <div>
-                <label class="mini-label">Age</label>
+                <label class="mini-label" id="lblOvrAge">Age</label>
                 <input type="number" id="ovrAge" class="input-control" placeholder="e.g., 45" min="0" max="115" />
               </div>
               <div>
@@ -210,14 +221,14 @@
         <div class="right-stack">
           <div class="card">
             <div class="card-header">
-              <h2>Microsoft Agent Framework Sequential Pipeline</h2>
+              <h2 id="pipelineTitle">Microsoft Agent Framework Sequential Pipeline</h2>
               <span id="cacheStatusPill" class="pill pill-neutral">Idle</span>
             </div>
             <div class="pipeline-list" id="pipelineSteps">
               <div class="step-card" data-stage="profile_intake_agent">
                 <div class="step-num">1</div>
                 <div class="step-body">
-                  <strong>Profile Intake Agent</strong>
+                  <strong class="step-name">Profile Intake Agent</strong>
                   <span class="step-desc">Language detection (12 langs) &amp; profile extraction → shared memory</span>
                 </div>
                 <span class="step-status">Waiting</span>
@@ -225,7 +236,7 @@
               <div class="step-card" data-stage="scheme_retrieval_agent">
                 <div class="step-num">2</div>
                 <div class="step-body">
-                  <strong>Scheme Retrieval Agent (RAG)</strong>
+                  <strong class="step-name">Scheme Retrieval Agent (RAG)</strong>
                   <span class="step-desc">Hybrid BM25 + Vector retrieval over scheme docs in PostgreSQL</span>
                 </div>
                 <span class="step-status">Waiting</span>
@@ -233,7 +244,7 @@
               <div class="step-card" data-stage="eligibility_rule_agent">
                 <div class="step-num">3</div>
                 <div class="step-body">
-                  <strong>Eligibility Rule Agent</strong>
+                  <strong class="step-name">Eligibility Rule Agent</strong>
                   <span class="step-desc">Deterministic rule engine evaluating retrieved scheme policies</span>
                 </div>
                 <span class="step-status">Waiting</span>
@@ -241,7 +252,7 @@
               <div class="step-card" data-stage="document_checklist_agent">
                 <div class="step-num">4</div>
                 <div class="step-body">
-                  <strong>Document Checklist Agent</strong>
+                  <strong class="step-name">Document Checklist Agent</strong>
                   <span class="step-desc">Deduplicated papers checklist &amp; issuing offices</span>
                 </div>
                 <span class="step-status">Waiting</span>
@@ -249,7 +260,7 @@
               <div class="step-card" data-stage="guide_manager_agent">
                 <div class="step-num">5</div>
                 <div class="step-body">
-                  <strong>Guide Manager + GroundingGate</strong>
+                  <strong class="step-name">Guide Manager + GroundingGate</strong>
                   <span class="step-desc">Verifies RAG/rule grounding &amp; compiles localized guide</span>
                 </div>
                 <span class="step-status">Waiting</span>
@@ -257,7 +268,7 @@
               <div class="step-card" data-stage="language_reviewer_agent">
                 <div class="step-num">6</div>
                 <div class="step-body">
-                  <strong>Language-Consistency Reviewer</strong>
+                  <strong class="step-name">Language-Consistency Reviewer</strong>
                   <span class="step-desc">Verifies target language script &amp; keeps scheme names intact</span>
                 </div>
                 <span class="step-status">Waiting</span>
@@ -268,14 +279,14 @@
           <!-- Interactive Multi-Turn Conversation History & 1-Click Follow-Up Suggestions -->
           <div class="card">
             <div class="card-header">
-              <h2>Interactive Session Conversation</h2>
+              <h2 id="chatThreadTitle">Interactive Session Conversation</h2>
               <span class="badge badge-neutral" id="turnCountBadge">0 Turns</span>
             </div>
             <div id="chatThreadBox" class="chat-thread">
-              <p class="muted">Start by speaking or typing your profile. Follow-up turns reuse your active session memory automatically.</p>
+              <p class="muted" id="chatEmptyHint">Start by speaking or typing your profile. Follow-up turns reuse your active session memory automatically.</p>
             </div>
             <div id="quickFollowupsBox" class="quick-followups hidden">
-              <span class="mini-label">1-Click Follow-Up Clarifications (Refine Active Session):</span>
+              <span class="mini-label" id="quickFollowupsTitle">1-Click Follow-Up Clarifications (Refine Active Session):</span>
               <div id="quickFollowupChips" class="sample-chips"></div>
             </div>
           </div>
@@ -291,7 +302,7 @@
           <!-- Localized Citizen Reply + Voice Read-Aloud & Export Toolbar -->
           <div class="card">
             <div class="card-header">
-              <h2>Verified Citizen Guide (Final Reply)</h2>
+              <h2 id="guideFinalTitle">Verified Citizen Guide (Final Reply)</h2>
               <div class="btn-row">
                 <span class="badge badge-success" id="replyLangBadge">en</span>
               </div>
@@ -318,14 +329,14 @@
           <!-- Extracted Citizen Profile & Interactive Document Readiness Checklist -->
           <div class="card">
             <div class="card-header">
-              <h2>Extracted Profile &amp; Document Checklist</h2>
+              <h2 id="extractedProfileTitle">Extracted Profile &amp; Document Checklist</h2>
               <span class="badge badge-info" id="docCountBadge">0 Docs</span>
             </div>
             <div id="extractedProfileChips" class="chip-grid"></div>
 
             <div class="doc-progress-wrap" id="docProgressWrap">
               <div class="label-split">
-                <h3 class="sub-heading" style="margin:0;">Required Documents Readiness</h3>
+                <h3 class="sub-heading" id="docReadinessHeading" style="margin:0;">Required Documents Readiness</h3>
                 <span class="mini-label" id="docReadinessText">0 / 0 Ready</span>
               </div>
               <div class="progress-track">
@@ -340,9 +351,22 @@
         <!-- Eligible Schemes Detailed Cards -->
         <div class="card">
           <div class="card-header">
-            <h2>Eligible Schemes, Rule-by-Rule Reasons &amp; Application Steps</h2>
+            <h2 id="eligibleSchemesTitle">Eligible Schemes, Rule-by-Rule Reasons &amp; Application Steps</h2>
             <span class="badge badge-success" id="eligibleCountBadge">0 Eligible</span>
           </div>
+
+          <!-- Interactive Category Filter Toolbar for Quick Exploration -->
+          <div class="scheme-filter-toolbar" id="schemeFilterToolbar">
+            <button type="button" class="cat-filter-btn active" data-cat="all" id="filterAllBtn">All Categories</button>
+            <button type="button" class="cat-filter-btn" data-cat="agri" id="filterAgriBtn">🌾 Agriculture &amp; Farmers</button>
+            <button type="button" class="cat-filter-btn" data-cat="health" id="filterHealthBtn">🏥 Healthcare</button>
+            <button type="button" class="cat-filter-btn" data-cat="housing" id="filterHousingBtn">🏠 Housing</button>
+            <button type="button" class="cat-filter-btn" data-cat="msme" id="filterMsmeBtn">💼 Loans &amp; MSME</button>
+            <button type="button" class="cat-filter-btn" data-cat="pension" id="filterPensionBtn">👵 Pensions &amp; Social Security</button>
+            <button type="button" class="cat-filter-btn" data-cat="women" id="filterWomenBtn">👩 Women &amp; Child</button>
+            <button type="button" class="cat-filter-btn" data-cat="insurance" id="filterInsuranceBtn">🛡️ Insurance</button>
+          </div>
+
           <div id="eligibleSchemesGrid" class="schemes-grid"></div>
         </div>
 
@@ -350,14 +374,14 @@
         <div class="grid-two">
           <div class="card">
             <div class="card-header">
-              <h2>Needs Clarification (Potential Schemes)</h2>
+              <h2 id="potentialSchemesTitle">Needs Clarification (Potential Schemes)</h2>
               <span class="badge badge-warn" id="potentialCountBadge">0</span>
             </div>
             <div id="potentialSchemesBox"></div>
           </div>
           <div class="card">
             <div class="card-header">
-              <h2>Excluded Candidates (Deterministic Rule Log)</h2>
+              <h2 id="ineligibleSchemesTitle">Excluded Candidates (Deterministic Rule Log)</h2>
               <span class="badge badge-neutral" id="ineligibleCountBadge">0</span>
             </div>
             <div id="ineligibleSchemesBox"></div>
@@ -444,6 +468,8 @@
     </section>
   </main>
 
+  <script src="/static/ui_translations.js"></script>
+  <script src="/static/scheme_metrics.js"></script>
   <script src="/static/voice_controller.js"></script>
   <script src="/static/app.js"></script>
 </body>

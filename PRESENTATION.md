@@ -167,14 +167,15 @@ style: |
 ---
 
 <!-- Slide 11 -->
-# Multilingual NLP & Voice Service
-## 12 Indian Languages & Dedicated Voice Microservice (:8004)
+# Multilingual NLP, Voice & Data Visualizer
+## 12 Languages, Dedicated Voice (:8004) & Scheme Analytics
 
 - **12 Indian Languages:** English (`en`), Hindi (`hi`), Punjabi (`pa`), Telugu (`te`), Tamil (`ta`), Bengali (`bn`), Marathi (`mr`), Kannada (`kn`), Gujarati (`gu`), Malayalam (`ml`), Odia (`or`), Urdu (`ur`, RTL).
-- **Urdu Right-to-Left (RTL):** Dynamic UI text flip (`dir="rtl"`) for Perso-Arabic / Nastaliq script.
-- **Speech-to-Text (STT):** Browser Web Speech API configured with BCP-47 locale (`pa-IN`, `te-IN`, `ur-IN`, etc.) with real-time transcript streaming.
-- **Markdown-to-Speech Sanitizer:** `POST /api/v1/voice/sanitize-speech` cleans Markdown tables, URLs, and asterisks into fluent spoken utterances.
-- **Non-Blocking Fallback:** Text input functions with 100% reliability even if microphone access is unavailable.
+- **Dynamic Full-Page Localization:** Selecting a language instantly updates all navbar titles, tabs, form inputs, placeholders, voice hints, and scheme metrics without reloading.
+- **Audio Waveform Equalizer:** 6-bar dynamic pulsating equalizer in the voice dock responding in real time to microphone dictation (STT) and read-aloud playback (TTS).
+- **Scheme Analytics & KPI Matrix:** Each scheme card features an SVG radial match gauge (100%/75%/35%), financial benefit KPI pill, and 4 comparative analytics bars (Match, Financial Index, Process Ease, Document Simplicity).
+- **Interactive Sector Filters:** Instant category filtering (`🌾 Agriculture`, `🏥 Healthcare`, `🏠 Housing`, `💼 Loans/MSME`, `👵 Pensions`, `👩 Women/Child`, `🛡️ Insurance`).
+- **Markdown Speech Sanitizer:** `POST /api/v1/voice/sanitize-speech` cleans Markdown tables, URLs, and asterisks into fluent spoken utterances.
 
 ---
 

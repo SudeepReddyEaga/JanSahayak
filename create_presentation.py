@@ -860,40 +860,40 @@ def create_deck():
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_MUTED
 
-    c11_2 = create_card(s11, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.3), "Voice & Speech Microservice (:8004)")
-    c11_2.paragraphs[0].text = "• Dedicated Decoupled Voice Microservice:"
+    c11_2 = create_card(s11, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.3), "Voice Microservice & Dynamic UI Localization")
+    c11_2.paragraphs[0].text = "• Real-Time Full-Page Dynamic UI Localization:"
     c11_2.paragraphs[0].font.bold = True
-    c11_2.paragraphs[0].font.size = Pt(12.5)
+    c11_2.paragraphs[0].font.size = Pt(12)
     p = c11_2.add_paragraph()
-    p.text = "  Runs on port 8004, insulating core agent reasoning from speech processing overhead."
-    p.font.size = Pt(11.5)
+    p.text = "  Selecting any language dynamically re-translates all navbar elements, tabs, form labels, voice buttons, and scheme metrics without page reload."
+    p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
 
     p = c11_2.add_paragraph()
-    p.text = "• Speech-to-Text (STT) Integration:"
+    p.text = "• Live Audio Waveform Equalizer & Voice Sync:"
     p.font.bold = True
-    p.font.size = Pt(12.5)
+    p.font.size = Pt(12)
     p = c11_2.add_paragraph()
-    p.text = "  Browser `webkitSpeechRecognition` auto-configured with the selected BCP-47 locale. Real-time interim transcript updates with auto-submission."
-    p.font.size = Pt(11.5)
+    p.text = "  6-bar animated audio equalizer in the voice dock pulsates dynamically during STT dictation and TTS playback. Speech recognition & synthesis auto-switch BCP-47 locale."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c11_2.add_paragraph()
+    p.text = "• Scheme Data Visualizer & Comparative Metrics:"
+    p.font.bold = True
+    p.font.size = Pt(12)
+    p = c11_2.add_paragraph()
+    p.text = "  Every scheme card features an SVG radial match gauge (100%/75%/35%), financial benefit KPI pill, 4-bar comparative analytics (Match, Financial Index, Process Ease, Document Simplicity), and category filter toolbar."
+    p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
 
     p = c11_2.add_paragraph()
     p.text = "• Markdown-to-Speech Sanitizer Endpoint:"
     p.font.bold = True
-    p.font.size = Pt(12.5)
+    p.font.size = Pt(12)
     p = c11_2.add_paragraph()
-    p.text = "  `POST /api/v1/voice/sanitize-speech` strips Markdown tables, URLs, emojis, and hashtags into clean, fluent sentences suitable for speech synthesis."
-    p.font.size = Pt(11.5)
-    p.font.color.rgb = TEXT_MUTED
-
-    p = c11_2.add_paragraph()
-    p.text = "• Non-Blocking Progressive Fallback:"
-    p.font.bold = True
-    p.font.size = Pt(12.5)
-    p = c11_2.add_paragraph()
-    p.text = "  If speech recognition is unsupported or denied permission, standard text input continues without disruption."
-    p.font.size = Pt(11.5)
+    p.text = "  `POST /api/v1/voice/sanitize-speech` cleans Markdown tables, URLs, and asterisks for smooth native TTS playback."
+    p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
