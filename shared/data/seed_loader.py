@@ -59,7 +59,6 @@ def upsert_scheme_orm(session: Session, scheme: SchemeDefinition) -> SchemeORM:
 
     # Refresh child RAG chunks and precompute 256-dim trigram+token embeddings
     orm_obj.chunks.clear()
-    session.flush()
     for chunk_id, chunk_idx, chunk_text in build_scheme_chunks(scheme):
         orm_obj.chunks.append(
             SchemeChunkORM(
