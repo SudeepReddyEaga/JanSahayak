@@ -566,12 +566,14 @@ flowchart TD
    - **Invariant 2 (Deterministic Rule Passage):** The scheme must possess zero failed rules (`len(res.failed_rules) == 0`) and at least one explicitly satisfied rule (`len(res.passed_rules) > 0`).
    - **Invariant 3 (Document Checklist Traceability):** Every document in the checklist must be linked to at least one verified eligible scheme.
    - If any scheme fails these invariants, it is stripped from `verified_scheme_ids` and logged in `ungrounded_claims`.
-2. **Multilingual Structure Synthesis:**
+2. **Multilingual Structure Synthesis & Direct Official Portal Linkage:**
    - Synthesizes the guide using the active language pack template (`shared/data/language_packs.py`):
      - **Greeting & Header:** Localized greeting matching cultural conventions.
-     - **Eligible Schemes List:** Formatted with official scheme titles, localized benefit summaries, and rule justifications.
-     - **Deduplicated Checklist:** Papers grouped with where-to-obtain guidance.
-     - **Step-by-Step Application Workflow:** Step 1 directs citizens to official portals (`_LOCALIZED_PORTAL_ACTION`), followed by physical CSC/Panchayat steps and toll-free helpline numbers.
+     - **Eligible Schemes List (Matched Policies):** Formatted with official scheme titles kept verbatim intact, localized benefit summaries, qualification reasons, and direct links to official ministry portals (`official_portal`) and toll-free helpline numbers.
+     - **Consolidated Deduplicated Checklist:** Papers grouped with issuing authorities and where-to-obtain guidance.
+     - **Step-by-Step Application Workflow:** Step 1 directs citizens to the official application portal (`_LOCALIZED_PORTAL_ACTION`), followed by physical CSC/Panchayat steps.
+     - **Potential Schemes Section:** Clearly lists schemes requiring 1–2 additional demographic confirmations along with direct official portal links so the citizen can review the prerequisites.
+     - **Other Evaluated Schemes Section (Non-Matched Policies):** Crucially, whenever a citizen's profile does not match certain welfare programs, the system explicitly lists each non-matching policy, explains transparently why it was not matched (e.g. landholding threshold, income ceiling, housing criteria), and provides a **direct link to the official government portal (`.gov.in` / `.nic.in`)** so the citizen can independently explore full scheme guidelines, review future eligibility, or learn more.
 3. **State Transitions & Memory Contract:**
    - **Reads from Memory:** `memory.profile.language`, `memory.eligibility_results`, `memory.document_checklist`.
    - **Writes to Memory:** `memory.grounding_report` (`GroundingReport`), `memory.draft_guide_text` (`str`).

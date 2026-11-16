@@ -559,7 +559,10 @@ function renderCompleteGuide(data) {
       <div class="scheme-card">
         <div class="scheme-header-row">
           <h3>${escapeHtml(s.official_name)}</h3>
-          <button type="button" class="btn btn-secondary btn-sm speak-scheme-btn" data-scheme-idx="${idx}" title="Read this scheme aloud">Speak</button>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" class="btn btn-secondary btn-sm speak-scheme-btn" data-scheme-idx="${idx}" title="Read this scheme aloud">Speak</button>
+            ${s.official_portal ? `<a href="${s.official_portal}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none;" title="Go directly to official portal">🌐 Official Site &rarr;</a>` : ""}
+          </div>
         </div>
         <div class="scheme-meta">${escapeHtml(s.ministry)} · RAG Score: ${s.rag_score.toFixed(2)}</div>
         <p><strong>Benefit:</strong> ${escapeHtml(s.localized_benefit_summary || s.benefit_summary)}</p>
@@ -572,7 +575,9 @@ function renderCompleteGuide(data) {
           <ol class="rule-list">
             ${s.application_steps.map((st) => `<li>${escapeHtml(st)}</li>`).join("")}
           </ol>
-          <div class="muted">Portal: <a href="${s.official_portal}" target="_blank" rel="noopener">${s.official_portal}</a> · Helpline: ${escapeHtml(s.helpline)}</div>
+          <div class="muted" style="margin-top:8px;">
+            Official Portal: <a href="${s.official_portal}" target="_blank" rel="noopener" style="font-weight:600; color:var(--primary);">${s.official_portal}</a> · Helpline: ${escapeHtml(s.helpline)}
+          </div>
         </details>
       </div>`
         )
@@ -588,14 +593,22 @@ function renderCompleteGuide(data) {
     });
   });
 
-  // Potential & Ineligible Cards
+  // Potential & Ineligible Cards with Direct Official Portal Links
   const potential = data.potential_schemes || [];
   document.getElementById("potentialCountBadge").textContent = potential.length;
   document.getElementById("potentialSchemesBox").innerHTML = potential.length
     ? potential
         .map(
           (p) =>
-            `<div class="session-item"><strong>${escapeHtml(p.official_name)}</strong><div class="muted">${escapeHtml(p.reason)}</div></div>`
+            `<div class="session-item" style="display:flex; flex-direction:column; gap:6px;">
+               <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                 <strong>${escapeHtml(p.official_name)}</strong>
+                 ${p.official_portal ? `<a href="${p.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none; white-space:nowrap;">🌐 Official Portal</a>` : ""}
+               </div>
+               <div class="muted">${escapeHtml(p.localized_reason || p.reason)}</div>
+               ${p.missing_fields && p.missing_fields.length ? `<div style="font-size:11.5px; color:#c2410c;">Pending confirmation: ${escapeHtml(p.missing_fields.join(", "))}</div>` : ""}
+               ${p.official_portal ? `<div style="font-size:11px;"><a href="${p.official_portal}" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">Learn more &amp; verify requirements on official portal &rarr;</a></div>` : ""}
+             </div>`
         )
         .join("")
     : `<p class="muted">No ambiguous/pending schemes.</p>`;
@@ -606,7 +619,14 @@ function renderCompleteGuide(data) {
     ? ineligible
         .map(
           (x) =>
-            `<div class="session-item"><strong>${escapeHtml(x.scheme_id)}</strong><div class="muted">${escapeHtml(x.reason)}</div></div>`
+            `<div class="session-item" style="display:flex; flex-direction:column; gap:6px;">
+               <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                 <strong>${escapeHtml(x.official_name || x.scheme_id)}</strong>
+                 ${x.official_portal ? `<a href="${x.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none; white-space:nowrap;">🌐 Official Portal &rarr;</a>` : ""}
+               </div>
+               <div class="muted" style="font-size:12px;"><strong>Reason not matched:</strong> ${escapeHtml(x.localized_reason || x.reason)}</div>
+               ${x.official_portal ? `<div style="font-size:11px;"><a href="${x.official_portal}" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">Explore official policy criteria &amp; future guidelines at ${escapeHtml(x.official_portal)}</a></div>` : ""}
+             </div>`
         )
         .join("")
     : `<p class="muted">None.</p>`;

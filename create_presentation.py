@@ -749,22 +749,22 @@ def create_deck():
     p.font.size = Pt(11.5)
     p.font.color.rgb = TEXT_MUTED
 
-    c9_2 = create_card(s9, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.3), "Structured Multilingual Guide Synthesis")
-    c9_2.paragraphs[0].text = "• Standardized 4-Part Citizen Guide:"
+    c9_2 = create_card(s9, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.3), "Direct Official Portals & Guide Synthesis")
+    c9_2.paragraphs[0].text = "• Official Portals for Matched & Non-Matched Policies:"
     c9_2.paragraphs[0].font.bold = True
     c9_2.paragraphs[0].font.size = Pt(12.5)
     p = c9_2.add_paragraph()
-    p.text = "  1. Greeting & Verified Scheme Count in citizen's language.\n  2. Eligible Schemes Section:\n     - Official Scheme Title (Verbatim Intact)\n     - Localized Benefit Summary\n     - Explicit Rule Justification Reason\n  3. Consolidated Document Checklist:\n     - Deduplicated papers with issuing authorities\n  4. Step-by-Step Application Workflow:\n     - Official portal link + local CSC action steps\n     - Toll-free citizen helpline numbers"
-    p.font.size = Pt(11)
+    p.text = "  1. Eligible Schemes (Matched):\n     - Official scheme title verbatim intact\n     - Localized benefit summary & qualification reason\n     - Direct official portal link (.gov.in/.nic.in) & helpline\n     - Step-by-step application guidance\n\n  2. Potential Schemes (Pending Facts):\n     - Lists unconfirmed criteria + direct official portal link\n\n  3. Non-Matched Schemes (Other Evaluated Policies):\n     - Transparent reason why profile did not qualify\n     - Direct link to official government portal so citizen can read policy details, criteria updates, and learn more."
+    p.font.size = Pt(10.5)
     p.font.color.rgb = TEXT_MUTED
 
     p = c9_2.add_paragraph()
-    p.text = "• Potential Schemes Section:"
+    p.text = "• Transparent Citizen Empowerment:"
     p.font.bold = True
     p.font.size = Pt(12.5)
     p = c9_2.add_paragraph()
-    p.text = "  Lists schemes that could be unlocked if missing fields are provided."
-    p.font.size = Pt(11.5)
+    p.text = "  Eliminates dead ends: citizens receive direct official portals for every evaluated program, enabling independent verification on official ministry websites."
+    p.font.size = Pt(11)
     p.font.color.rgb = TEXT_MUTED
 
     p = c9_2.add_paragraph()

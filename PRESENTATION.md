@@ -143,11 +143,11 @@ style: |
   1. **Invariant 1 (RAG Lineage):** Scheme must exist in `retrieved_scheme_ids` with non-empty chunk evidence IDs.
   2. **Invariant 2 (Deterministic Passage):** Scheme must have 0 failed rules and $\ge 1$ passed rule.
   3. **Invariant 3 (Document Traceability):** Every checklist paper must link to at least one verified eligible scheme.
-- **Structured Multilingual Guide Synthesis:**
-  - Localized greeting & eligible count.
-  - Official scheme titles kept verbatim intact with benefit summaries and qualification reasons.
-  - Consolidated document checklist with issuing authorities.
-  - Step-by-step application workflow, official portals, and toll-free helpline numbers.
+- **Direct Official Portals for Both Matched & Non-Matched Policies:**
+  - **Eligible Schemes (Matched):** Official scheme titles kept verbatim intact with benefit summaries, qualification reasons, step-by-step workflow, and direct official portal links (`.gov.in` / `.nic.in`).
+  - **Potential Schemes (Pending Facts):** Lists missing confirmation fields + direct official portal link to verify prerequisites.
+  - **Non-Matched Schemes (Other Evaluated Policies):** Lists every evaluated policy with its explicit non-matching reason AND a direct official government portal link so the citizen can learn more directly from the ministry site.
+  - **Consolidated document checklist** with issuing authorities and toll-free helpline numbers.
 
 ---
 

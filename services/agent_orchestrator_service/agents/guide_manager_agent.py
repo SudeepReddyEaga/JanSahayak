@@ -122,12 +122,31 @@ class GuideManagerAgent(SpecializedPipelineAgent):
 
         if potential:
             lines.append("")
-            lines.append(f"### {tpl['potential_heading']}")
-            for item in potential[:3]:
+            lines.append(f"### {tpl['potential_heading']} ({len(potential)})")
+            learn_lbl = tpl.get("learn_more_label", tpl["portal_label"])
+            for item in potential:
                 missing_str = ", ".join(item.missing_fields)
+                portal_str = f" | {learn_lbl}: {item.official_portal}" if item.official_portal else ""
                 lines.append(
-                    f"- **{item.official_name}** ({tpl['missing_fields_note']}: {missing_str})"
+                    f"- **{item.official_name}** ({tpl['missing_fields_note']}: {missing_str}){portal_str}"
                 )
+
+        ineligible = [
+            r for r in memory.eligibility_results if r.status == EligibilityStatus.INELIGIBLE
+        ]
+        if ineligible:
+            lines.append("")
+            other_hdr = tpl.get(
+                "other_schemes_heading",
+                "Other Government Welfare Schemes Evaluated (Direct Official Portals to Learn More)",
+            )
+            learn_lbl = tpl.get("learn_more_label", tpl["portal_label"])
+            lines.append(f"### {other_hdr} ({len(ineligible)})")
+            for item in ineligible:
+                lines.append(f"- **{item.official_name}**")
+                lines.append(f"   - {tpl['reason_label']}: {item.localized_reason or item.reason}")
+                if item.official_portal:
+                    lines.append(f"   - {learn_lbl}: {item.official_portal}")
 
         lines.append("")
         lines.append(f"_{tpl['grounding_note']}_")

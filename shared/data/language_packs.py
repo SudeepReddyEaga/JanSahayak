@@ -52,6 +52,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "Satisfied criteria",
         "where_label": "Where to get",
         "step_prefix": "Step",
+        "other_schemes_heading": "Other Government Welfare Schemes Evaluated (Direct Official Portals to Learn More)",
+        "learn_more_label": "Official Portal & Learn More",
     },
     "hi": {
         "language_name": "हिन्दी (Hindi)",
@@ -70,6 +72,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "पूर्ण मानदंड",
         "where_label": "कहां से प्राप्त करें",
         "step_prefix": "चरण",
+        "other_schemes_heading": "अन्य मूल्यांकित सरकारी कल्याणकारी योजनाएं (सीधे आधिकारिक पोर्टल से जानकारी लें)",
+        "learn_more_label": "आधिकारिक पोर्टल व अधिक जानकारी",
     },
     "te": {
         "language_name": "తెలుగు (Telugu)",
@@ -88,6 +92,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "సరిపోయిన ప్రమాణాలు",
         "where_label": "ఎక్కడ పొందాలి",
         "step_prefix": "దశ",
+        "other_schemes_heading": "పరిశీలించిన ఇతర ప్రభుత్వ సంక్షేమ పథకాలు (వివరాలకు అధికారిక పోర్టల్ చూడండి)",
+        "learn_more_label": "అధికారిక పోర్టల్ మరియు మరిన్ని వివరాలు",
     },
     "ta": {
         "language_name": "தமிழ் (Tamil)",
@@ -106,6 +112,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "பூர்த்தி செய்யப்பட்ட விதிகள்",
         "where_label": "எங்கே பெறுவது",
         "step_prefix": "படி",
+        "other_schemes_heading": "மதிப்பாய்வு செய்யப்பட்ட பிற அரசுத் திட்டங்கள் (அதிகாரப்பூர்வ தளத்தில் மேலும் அறிய)",
+        "learn_more_label": "அதிகாரப்பூர்வ இணையதளம் மற்றும் கூடுதல் விவரங்கள்",
     },
     "bn": {
         "language_name": "বাংলা (Bengali)",
@@ -124,6 +132,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "পূরণকৃত শর্তাবলি",
         "where_label": "কোথায় পাবেন",
         "step_prefix": "ধাপ",
+        "other_schemes_heading": "অন্যান্য পরীক্ষিত সরকারি কল্যাণ প্রকল্প (অফিশিয়াল পোর্টালে বিস্তারিত দেখুন)",
+        "learn_more_label": "অফিশিয়াল পোর্টাল ও বিস্তারিত তথ্য",
     },
     "mr": {
         "language_name": "मराठी (Marathi)",
@@ -142,6 +152,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "पूर्ण झालेल्या अटी",
         "where_label": "कुठे मिळेल",
         "step_prefix": "टप्पा",
+        "other_schemes_heading": "तपासलेल्या इतर सरकारी कल्याणकारी योजना (अधिकृत पोर्टलवरून सविस्तर माहिती घ्या)",
+        "learn_more_label": "अधिकृत पोर्टल आणि अधिक माहिती",
     },
     "kn": {
         "language_name": "ಕನ್ನಡ (Kannada)",
@@ -160,6 +172,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "ಪೂರೈಸಿದ ಮಾನದಂಡಗಳು",
         "where_label": "ಎಲ್ಲಿ ಪಡೆಯಬೇಕು",
         "step_prefix": "ಹಂತ",
+        "other_schemes_heading": "ಮೌಲ್ಯಮಾಪನ ಮಾಡಿದ ಇತರ ಸರ್ಕಾರಿ ಕಲ್ಯಾಣ ಯೋಜನೆಗಳು (ಹೆಚ್ಚಿನ ಮಾಹಿತಿಗಾಗಿ ಅಧಿಕೃತ ಪೋರ್ಟಲ್ ನೋಡಿ)",
+        "learn_more_label": "ಅಧಿಕೃತ ಪೋರ್ಟಲ್ ಮತ್ತು ಹೆಚ್ಚಿನ ಮಾಹಿತಿ",
     },
     "pa": {
         "language_name": "ਪੰਜਾਬੀ (Punjabi)",
@@ -178,6 +192,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "ਪੂਰੇ ਕੀਤੇ ਮਾਪਦੰਡ",
         "where_label": "ਕਿੱਥੋਂ ਪ੍ਰਾਪਤ ਕਰੀਏ",
         "step_prefix": "ਕਦਮ",
+        "other_schemes_heading": "ਜਾਂਚੀਆਂ ਗਈਆਂ ਹੋਰ ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ (ਹੋਰ ਜਾਣਕਾਰੀ ਲਈ ਅਧਿਕਾਰਤ ਪੋਰਟਲ ਦੇਖੋ)",
+        "learn_more_label": "ਅਧਿਕਾਰਤ ਪੋਰਟਲ ਅਤੇ ਹੋਰ ਜਾਣਕਾਰੀ",
     },
     "gu": {
         "language_name": "ગુજરાતી (Gujarati)",
@@ -196,6 +212,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "પૂર્ણ થયેલ માપદંડ",
         "where_label": "ક્યાંથી મેળવવું",
         "step_prefix": "પગલું",
+        "other_schemes_heading": "તપાસાયેલ અન્ય સરકારી કલ્યાણકારી યોજનાઓ (સત્તાવાર પોર્ટલ પર વધુ વિગતો જુઓ)",
+        "learn_more_label": "સત્તાવાર પોર્ટલ અને વધુ વિગતો",
     },
     "ml": {
         "language_name": "മലയാളം (Malayalam)",
@@ -214,6 +232,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "പൂർത്തിയാക്കിയ മാനദണ്ഡങ്ങൾ",
         "where_label": "എവിടെ നിന്ന് ലഭിക്കും",
         "step_prefix": "ഘട്ടം",
+        "other_schemes_heading": "പരിശോധിച്ച മറ്റ് സർക്കാർ ക്ഷേമ പദ്ധതികൾ (കൂടുതൽ വിവരങ്ങൾക്ക് ഔദ്യോഗിക പോർട്ടൽ സന്ദർശിക്കുക)",
+        "learn_more_label": "ഔദ്യോഗിക പോർട്ടലും കൂടുതൽ വിവരങ്ങളും",
     },
     "or": {
         "language_name": "ଓଡ଼ିଆ (Odia)",
@@ -232,6 +252,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "ପୂରଣ ହୋଇଥିବା ମାନଦଣ୍ଡ",
         "where_label": "କେଉଁଠାରୁ ମିଳିବ",
         "step_prefix": "ପର୍ଯ୍ୟାୟ",
+        "other_schemes_heading": "ଯାଞ୍ଚ ହୋଇଥିବା ଅନ୍ୟାନ୍ୟ ସରକାରୀ ଯୋଜନା (ଅଧିକ ଜାଣିବା ପାଇଁ ସରକାରୀ ପୋର୍ଟାଲ୍ ଦେଖନ୍ତୁ)",
+        "learn_more_label": "ସରକାରୀ ପୋର୍ଟାଲ୍ ଏବଂ ଅଧିକ ସୂଚନା",
     },
     "ur": {
         "language_name": "اردو (Urdu)",
@@ -250,6 +272,8 @@ LANGUAGE_TEMPLATES: dict[str, dict[str, str]] = {
         "reason_prefix": "پورے کیے گئے معیار",
         "where_label": "کہاں سے حاصل کریں",
         "step_prefix": "مرحلہ",
+        "other_schemes_heading": "دیگر جانچی گئی سرکاری فلاحی اسکیمیں (براہ راست سرکاری پورٹل سے معلومات حاصل کریں)",
+        "learn_more_label": "سرکاری پورٹل اور مزید معلومات",
     },
 }
 
