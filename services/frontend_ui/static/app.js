@@ -468,6 +468,138 @@ function bindActionButtons() {
   document.getElementById("refreshCacheBtn").addEventListener("click", loadCacheStats);
   document.getElementById("flushCacheBtn").addEventListener("click", flushRedisCache);
   document.getElementById("kbSearchInput").addEventListener("input", renderFilteredSchemes);
+
+  // Scheme Walkthrough Modal Listeners
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  if (closeModalBtn) closeModalBtn.addEventListener("click", closeSchemeWalkthroughModal);
+
+  const closeModalFooterBtn = document.getElementById("closeModalFooterBtn");
+  if (closeModalFooterBtn) closeModalFooterBtn.addEventListener("click", closeSchemeWalkthroughModal);
+
+  const modalBackdrop = document.getElementById("schemeWalkthroughModal");
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener("click", (ev) => {
+      if (ev.target === modalBackdrop) {
+        closeSchemeWalkthroughModal();
+      }
+    });
+  }
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") {
+      closeSchemeWalkthroughModal();
+    }
+  });
+}
+
+function closeSchemeWalkthroughModal() {
+  const modal = document.getElementById("schemeWalkthroughModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    document.body.style.overflow = "";
+  }
+}
+
+function openSchemeWalkthroughModal(s, lang = "en", allDocs = []) {
+  if (!s) return;
+  const modal = document.getElementById("schemeWalkthroughModal");
+  if (!modal) return;
+
+  const tr = (k) => (window.t ? window.t(k, lang) : k);
+  const meta = window.getSchemeMetrics ? window.getSchemeMetrics(s.scheme_id) : { category: "general", color: "#10b981", category_name: "General" };
+
+  // Set modal header details
+  const badgeEl = document.getElementById("modalCategoryBadge");
+  badgeEl.textContent = meta.category_name || s.ministry;
+  badgeEl.style.backgroundColor = meta.color || "#10b981";
+
+  document.getElementById("modalSchemeTitle").textContent = s.official_name;
+  document.getElementById("modalMinistryText").textContent = `${s.ministry} · Helpline: ${s.helpline || '1800-XXX-XXXX'}`;
+
+  // Direct Official Portal Button
+  const portalLink = document.getElementById("modalOfficialPortalLink");
+  portalLink.href = s.official_portal || "#";
+  portalLink.innerHTML = `🌐 ${tr('official_site_btn')} (${s.official_portal})`;
+
+  // Helpline badge
+  const helplineBadge = document.getElementById("modalHelplineBadge");
+  helplineBadge.textContent = `📞 ${s.helpline || 'National Toll-Free 1800'}`;
+
+  // Benefit and Why Qualified
+  document.getElementById("modalBenefitHeading").textContent = tr('benefit_label');
+  document.getElementById("modalBenefitSummary").textContent = s.localized_benefit_summary || s.benefit_summary || "Direct DBT financial assistance and welfare coverage.";
+
+  document.getElementById("modalWhyQualifiedHeading").textContent = tr('why_qualified_label');
+  document.getElementById("modalWhyQualifiedText").textContent = s.localized_reason || s.reason || "Profile satisfied all statutory rules.";
+
+  // Application Steps
+  document.getElementById("modalStepsHeading").textContent = tr('modal_steps_heading') || "Step-by-Step Official Portal Application Guide";
+  document.getElementById("modalStepsIntro").textContent = tr('modal_steps_intro') || "Follow these sequential steps on the official government website to complete your application:";
+
+  const stepsList = document.getElementById("modalStepsList");
+  const steps = (s.application_steps && s.application_steps.length)
+    ? s.application_steps
+    : [
+        `Visit official portal: ${s.official_portal}`,
+        "Click on Citizen/New Beneficiary Registration.",
+        "Authenticate using Aadhaar and mobile OTP.",
+        "Fill application form and verify bank details for direct benefit transfer (DBT).",
+        "Upload scanned document proofs and note your Application Reference ID."
+      ];
+
+  stepsList.innerHTML = steps.map((step, idx) => `
+    <li class="step-guide-item" style="display:flex; gap:12px; align-items:flex-start; margin-bottom:10px;">
+      <span class="step-guide-num" style="background:#2563eb; color:#ffffff; font-weight:700; font-size:12px; border-radius:50%; min-width:24px; height:24px; display:inline-flex; align-items:center; justify-content:center;">${idx + 1}</span>
+      <div class="step-guide-text" style="font-size:0.92rem; color:#1e293b; line-height:1.5;">${escapeHtml(step)}</div>
+    </li>
+  `).join("");
+
+  // Required Documents
+  document.getElementById("modalDocsHeading").textContent = tr('modal_docs_heading') || "Required Official Documents & Where to Obtain";
+  document.getElementById("modalDocsIntro").textContent = tr('modal_docs_intro') || "Keep these original documents and photocopies ready before visiting the portal or Common Service Centre:";
+
+  const schemeDocs = (allDocs || []).filter(d => (d.required_for_schemes || []).includes(s.scheme_id));
+  const docsToShow = schemeDocs.length ? schemeDocs : (allDocs || []);
+  const docsGrid = document.getElementById("modalDocsList");
+
+  if (docsToShow.length) {
+    docsGrid.innerHTML = docsToShow.map(d => {
+      const docTitle = (d.localized_names && d.localized_names[lang]) ? d.localized_names[lang] : d.name;
+      return `
+        <div class="modal-doc-card">
+          <div style="font-weight:700; color:#0f172a; font-size:0.92rem;">📄 ${escapeHtml(docTitle)}</div>
+          <div class="muted" style="font-size:0.8rem; margin:2px 0 4px;">${escapeHtml(d.description || '')}</div>
+          <div style="font-size:0.8rem; color:#2563eb; font-weight:600;">
+            🏛️ <em>Where to obtain:</em> ${escapeHtml(d.where_to_obtain || 'Tehsildar / CSC / Village Revenue Officer')}
+          </div>
+        </div>
+      `;
+    }).join("");
+  } else {
+    docsGrid.innerHTML = `
+      <div class="modal-doc-card">
+        <div style="font-weight:700; color:#0f172a;">📄 Aadhaar Card & Bank Account Passbook</div>
+        <div class="muted">Mandatory identity and DBT account verification papers.</div>
+        <div style="font-size:0.8rem; color:#2563eb; font-weight:600;">🏛️ Where to obtain: UIDAI / Scheduled Commercial Bank</div>
+      </div>
+    `;
+  }
+
+  // Audio Read-Aloud Button
+  const speakBtn = document.getElementById("modalSpeakBtn");
+  if (speakBtn) {
+    speakBtn.textContent = tr('modal_listen_btn') || "🔊 Listen Instructions Aloud";
+    speakBtn.onclick = () => {
+      const docTitles = docsToShow.map(d => (d.localized_names && d.localized_names[lang]) || d.name).slice(0, 3).join(", ");
+      const speech = `${s.official_name}. ${s.localized_benefit_summary || s.benefit_summary}. First step: ${steps[0]}. Key documents required: ${docTitles}. Complete application on ${s.official_portal}.`;
+      if (voiceController) {
+        voiceController.speakGuide(speech, lang);
+      }
+    };
+  }
+
+  modal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 }
 
 function updateSessionBadge() {
@@ -763,7 +895,7 @@ function renderCompleteGuide(data) {
             const meta = window.getSchemeMetrics ? window.getSchemeMetrics(s.scheme_id) : { category: "general", color: "#10b981", category_name: "General" };
             const metricsHTML = window.buildSchemeMetricsHTML ? window.buildSchemeMetricsHTML(s, data.detected_language, 100) : "";
             return `
-      <div class="scheme-card" data-category="${meta.category}" style="border-top: 4px solid ${meta.color};">
+      <div class="scheme-card" data-scheme-idx="${idx}" data-category="${meta.category}" style="border-top: 4px solid ${meta.color}; cursor:pointer;" title="Click to view detailed step-by-step portal guide & papers">
         <div class="scheme-header-row">
           <div>
             <span class="badge" style="background: ${meta.color}20; color: ${meta.color}; font-weight:700; margin-bottom:5px; display:inline-block;">
@@ -771,9 +903,10 @@ function renderCompleteGuide(data) {
             </span>
             <h3 style="margin:2px 0 6px;">${escapeHtml(s.official_name)}</h3>
           </div>
-          <div style="display:flex; gap:6px; align-items:center;">
+          <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+            <button type="button" class="btn btn-primary btn-sm view-walkthrough-btn" data-scheme-idx="${idx}" title="Open step-by-step portal application guide & document list">📋 ${tr('view_walkthrough_btn')}</button>
             <button type="button" class="btn btn-secondary btn-sm speak-scheme-btn" data-scheme-idx="${idx}" title="Read this scheme aloud">${tr('speak_scheme_btn')}</button>
-            ${s.official_portal ? `<a href="${s.official_portal}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="text-decoration:none;" title="Go directly to official portal">${tr('official_site_btn')}</a>` : ""}
+            ${s.official_portal ? `<a href="${s.official_portal}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" style="text-decoration:none;" title="Go directly to official portal">${tr('official_site_btn')}</a>` : ""}
           </div>
         </div>
         <div class="scheme-meta">${escapeHtml(s.ministry)} · RAG Score: ${s.rag_score.toFixed(2)}</div>
@@ -801,8 +934,25 @@ function renderCompleteGuide(data) {
         .join("")
     : `<p class="muted">${tr('no_eligible_schemes')}</p>`;
 
+  grid.querySelectorAll(".view-walkthrough-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const s = eligible[parseInt(btn.dataset.schemeIdx, 10)];
+      if (s) openSchemeWalkthroughModal(s, data.detected_language, data.document_checklist);
+    });
+  });
+
+  grid.querySelectorAll(".scheme-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if (e.target.closest("button, a, summary, input, select")) return;
+      const s = eligible[parseInt(card.dataset.schemeIdx, 10)];
+      if (s) openSchemeWalkthroughModal(s, data.detected_language, data.document_checklist);
+    });
+  });
+
   grid.querySelectorAll(".speak-scheme-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
       const s = eligible[parseInt(btn.dataset.schemeIdx, 10)];
       if (!s) return;
       const snippet = `${s.official_name}. ${s.localized_benefit_summary || s.benefit_summary}. ${s.localized_reason || s.reason}.`;
@@ -862,6 +1012,9 @@ function renderCompleteGuide(data) {
     voiceController.speakGuide(data.final_reply, data.detected_language);
   }
 }
+
+// Function alias supporting dynamic language change re-render
+const renderGuideResponse = renderCompleteGuide;
 
 function renderQuickFollowups(missingFields) {
   const wrapper = document.getElementById("quickFollowupsBox");

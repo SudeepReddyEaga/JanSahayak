@@ -103,11 +103,20 @@ def create_orchestrator_components(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize orchestrator pipeline and evaluator at FastAPI startup."""
-    pipeline, evaluator, memory_client = create_orchestrator_components()
+    """Initialize orchestrator pipeline, pre-warm cache from DB, and ready evaluator at FastAPI startup."""
+    cfg = get_settings()
+    pipeline, evaluator, memory_client = create_orchestrator_components(cfg)
     app.state.pipeline = pipeline
     app.state.evaluator = evaluator
     app.state.memory_client = memory_client
+    try:
+        from shared.infrastructure.database import get_db_manager
+        db_mgr = get_db_manager(cfg.database_url)
+        if pipeline._semantic_cache:
+            warmed = pipeline._semantic_cache.prewarm_cache_from_db(db_mgr)
+            logger.info(f"Agent Orchestrator pre-warmed {warmed} database entries into Redis cache.")
+    except Exception as exc:
+        logger.warning(f"Orchestrator cache pre-warming skipped: {exc}")
     logger.info("Agent Orchestrator Service initialized with Microsoft Agent Framework SequentialBuilder.")
     yield
 

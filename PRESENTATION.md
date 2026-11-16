@@ -35,6 +35,28 @@ style: |
 ---
 
 <!-- Slide 2 -->
+# System Architecture & Data Flow Diagram (DFD)
+## Multi-Agent DFD, Query Caching Lifecycle & Interactive Guidance
+
+### Detailed Multi-Agent Data Flow Diagram (DFD):
+1. **Citizen Input (Voice STT / Text):** 12 Indian Languages (`en`, `hi`, `pa`, `te`, `ta`, `bn`, `mr`, `kn`, `gu`, `ml`, `or`, `ur` RTL).
+2. **Redis Two-Tier Cache Lookup:** Exact O(1) & Cosine Semantic $\ge$ 0.90 $\rightarrow$ Hit returns in <5ms with 0 tokens.
+3. **Profile Intake Agent:** Script detection, Indic/Urdu numerals $\rightarrow$ 14 demographic slots $\rightarrow$ Shared Memory.
+4. **Shared UserProfileMemory (PostgreSQL 16 + Redis Blackboard):** All 6 specialized agents read and write atomic state snapshots.
+5. **Scheme Retrieval (Hybrid RAG) & Eligibility Rule (Deterministic AST):** BM25 + Trigram Vector retrieval $\rightarrow$ Top 10 $\rightarrow$ Deterministic rule AST execution.
+6. **Checklist, Guide Manager (GroundingGate) & Language Reviewer:** Deduplicated papers $\rightarrow$ 3 invariant checks $\rightarrow$ Verbatim scheme names intact.
+7. **Verified Output & Write-Through Cache:** Committed to PostgreSQL `CITIZEN_SESSIONS` and cached in Redis.
+
+### Intelligent Caching, Pre-Warming & Citizen Guidance:
+- **Query Caching & Storage Lifecycle:** New queries run the 6-agent chain, persist to PostgreSQL (`CITIZEN_SESSIONS`, `query_cache_audit`), and write through to Redis. Repeated queries fetch directly from Redis/DB, **saving 99% computation power** (0 tokens, 0 agent invocations, <5ms latency).
+- **Startup Cache Pre-Warming:** At server boot, all 17 welfare schemes, policy chunks, 256-dim vector embeddings, and known cached queries from PostgreSQL are pre-loaded into Redis RAM for instant zero-latency retrieval.
+- **Missing Info & Dynamic Clarifications:** If a scheme needs more info to verify eligibility, the system actively prompts the citizen with 1-click clarification chips, eliminating all doubts.
+- **Transparent Rejection Reasons & Official Links:** Ineligible schemes explicitly list the exact statutory criteria failed (e.g. income cap, pucca house) with official `.gov.in` portal links.
+- **Localized Step-by-Step Portal Guide & Papers:** Clicking any scheme on the UI opens an interactive modal detailing step-by-step portal instructions and required documents in the citizen's chosen language.
+
+---
+
+<!-- Slide 3 -->
 # Problem Statement & Real-World Motivation
 ## The Citizen Welfare Access Dilemma in India
 
@@ -45,7 +67,7 @@ style: |
 
 ---
 
-<!-- Slide 3 -->
+<!-- Slide 4 -->
 # System Architecture & Microservices Topology
 ## Decoupled Microservice Topology (6 Services + 2 Backing Stores)
 
@@ -62,7 +84,7 @@ style: |
 
 ---
 
-<!-- Slide 4 -->
+<!-- Slide 5 -->
 # Multi-Agent Sequential Pipeline Architecture
 ## Microsoft Agent Framework (`SequentialBuilder`) Coordination
 
@@ -74,7 +96,7 @@ style: |
 
 ---
 
-<!-- Slide 5 -->
+<!-- Slide 6 -->
 # Agent 1: Profile Intake Agent
 ## Language Detection & Demographic Slot Extraction
 
@@ -89,7 +111,7 @@ style: |
 
 ---
 
-<!-- Slide 6 -->
+<!-- Slide 7 -->
 # Agent 2: Scheme Retrieval Agent
 ## Grounded Hybrid Lexical (BM25) + Dense Vector RAG
 
@@ -103,7 +125,7 @@ style: |
 
 ---
 
-<!-- Slide 7 -->
+<!-- Slide 8 -->
 # Agent 3: Eligibility Rule Agent
 ## Deterministic Strategy Pattern & Tri-State Classification
 
@@ -120,7 +142,7 @@ style: |
 
 ---
 
-<!-- Slide 8 -->
+<!-- Slide 9 -->
 # Agent 4: Document Checklist Agent
 ## Intelligent Cross-Scheme Merging & Deduplication
 
@@ -135,7 +157,7 @@ style: |
 
 ---
 
-<!-- Slide 9 -->
+<!-- Slide 10 -->
 # Agent 5: Guide Manager Agent & GroundingGate
 ## Formal Verification & Structured Synthesis
 
@@ -151,7 +173,7 @@ style: |
 
 ---
 
-<!-- Slide 10 -->
+<!-- Slide 11 -->
 # Agent 6: Language-Consistency Reviewer Agent
 ## Group-of-3 Quality Assurance & Auto-Repair Engine
 
@@ -166,7 +188,7 @@ style: |
 
 ---
 
-<!-- Slide 11 -->
+<!-- Slide 12 -->
 # Multilingual NLP, Voice & Data Visualizer
 ## 12 Languages, Dedicated Voice (:8004) & Scheme Analytics
 
@@ -179,7 +201,7 @@ style: |
 
 ---
 
-<!-- Slide 12 -->
+<!-- Slide 13 -->
 # Database Design & Redis Caching
 ## PostgreSQL 16 Schema & Profile-Guarded Two-Tier Cache
 
@@ -190,11 +212,11 @@ style: |
   - **Demographic Fingerprint:** Generates SHA-256 `profile_hash` over normalized demographic facts.
   - **Tier 1 (Exact Hit):** $\mathcal{O}(1)$ lookup on `<profile_hash>:<query_hash>`. Latency $< 5\text{ms}$.
   - **Tier 2 (Semantic Paraphrase):** Cosine similarity $\ge 0.90$ within the exact same demographic bucket.
-  - **Zero Cross-Profile Hallucination Guarantee:** Completely partitions cache by demographic signature.
+  - **Startup Cache Pre-Warming:** Preloads all schemes, chunks, and cached queries into Redis RAM at server boot.
 
 ---
 
-<!-- Slide 13 -->
+<!-- Slide 14 -->
 # Software Engineering & Low-Level Design (LLD)
 ## SOLID Principles & Design Patterns
 
@@ -211,7 +233,7 @@ style: |
 
 ---
 
-<!-- Slide 14 -->
+<!-- Slide 15 -->
 # Quantitative Evaluation Benchmark (CO3 & CO4)
 ## 10 Multilingual Citizen Profiles Evaluated
 
@@ -227,7 +249,7 @@ style: |
 
 ---
 
-<!-- Slide 15 -->
+<!-- Slide 16 -->
 # Deployment & Execution
 ## Three Flexible Deployment Options & Automated Testing
 
@@ -243,7 +265,7 @@ style: |
 
 ---
 
-<!-- Slide 16 -->
+<!-- Slide 17 -->
 # Summary & Academic Compliance
 ## Attainment of CO3 & CO4 · Bloom's L4, L5, L6
 

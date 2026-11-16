@@ -347,6 +347,116 @@
     .nav-btn:hover {
       background: var(--saffron);
     }
+
+    /* DFD Diagram Styles */
+    .dfd-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+    }
+
+    .dfd-step {
+      background: #f8fafc;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 7px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dfd-step.dfd-citizen {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+
+    .dfd-step.dfd-cache {
+      background: #fefce8;
+      border-color: #fde047;
+    }
+
+    .dfd-step.dfd-agent {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+
+    .dfd-step.dfd-output {
+      background: #faf5ff;
+      border-color: #d8b4fe;
+    }
+
+    .dfd-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dfd-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 11.5px;
+      line-height: 1.3;
+    }
+
+    .dfd-text strong {
+      color: #0f172a;
+      font-size: 12px;
+    }
+
+    .dfd-text span {
+      color: #64748b;
+      font-size: 10.5px;
+    }
+
+    .dfd-arrow-down {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1;
+      margin: -2px 0;
+    }
+
+    .dfd-tag {
+      font-size: 9.5px;
+      background: #e2e8f0;
+      color: #475569;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+      display: inline-block;
+      margin-left: 4px;
+    }
+
+    .dfd-memory-box {
+      background: #f1f5f9;
+      border: 1.5px dashed #64748b;
+      border-radius: 8px;
+      padding: 6px 12px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      font-size: 11px;
+      line-height: 1.25;
+    }
+
+    .dfd-memory-box strong {
+      color: var(--navy);
+      font-size: 11.5px;
+    }
+
+    .dfd-memory-box span {
+      color: #64748b;
+      font-size: 10px;
+    }
   </style>
 </head>
 <body>
@@ -379,8 +489,106 @@
       </div>
     </div>
 
-    <!-- SLIDE 2: Problem Statement & Motivation -->
+    <!-- SLIDE 2: Multi-Agent DFD & Query Lifecycle -->
     <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div class="slide-tag">System Architecture &amp; Data Flow Diagram (DFD)</div>
+        <div class="slide-title">Multi-Agent DFD, Query Caching Lifecycle &amp; Interactive Guidance</div>
+      </div>
+      <div class="slide-body grid-2">
+        <div class="card">
+          <div class="card-title">Detailed Agentic Data Flow Diagram (DFD)</div>
+          <div class="card-content">
+            <div class="dfd-flow">
+              <div class="dfd-step dfd-citizen">
+                <span class="dfd-num">1</span>
+                <div class="dfd-text">
+                  <strong>Citizen Input (Voice STT / Text)</strong>
+                  <span>12 Languages (en, hi, pa, te, ta, bn, mr, kn, gu, ml, or, ur)</span>
+                </div>
+              </div>
+              <div class="dfd-arrow-down">&darr;</div>
+
+              <div class="dfd-step dfd-cache">
+                <span class="dfd-num">2</span>
+                <div class="dfd-text">
+                  <strong>Redis Two-Tier Cache Lookup (Profile + Query Hash)</strong>
+                  <span>Exact O(1) &amp; Cosine Semantic &ge; 0.90 &bull; Hit &rarr; Sub-5ms Return (0 Tokens)</span>
+                </div>
+              </div>
+              <div class="dfd-arrow-down">&darr; <span class="dfd-tag">Cache Miss / Live Chain</span></div>
+
+              <div class="dfd-step dfd-agent">
+                <span class="dfd-num">3</span>
+                <div class="dfd-text">
+                  <strong>Profile Intake Agent</strong>
+                  <span>Script Detection, Indic/Urdu Numerals &rarr; 14 Slots &rarr; Shared Memory</span>
+                </div>
+              </div>
+              <div class="dfd-arrow-down">&darr;</div>
+
+              <div class="dfd-memory-box">
+                <strong>Shared UserProfileMemory (PostgreSQL 16 + Redis Blackboard)</strong>
+                <span>All 6 specialized agents read and write atomic state snapshots</span>
+              </div>
+              <div class="dfd-arrow-down">&darr;</div>
+
+              <div class="dfd-step dfd-agent">
+                <span class="dfd-num">4</span>
+                <div class="dfd-text">
+                  <strong>Scheme Retrieval (Hybrid RAG) &amp; Eligibility Rule (Deterministic AST)</strong>
+                  <span>BM25 + Trigram Vector Retrieval &bull; Mathematical Rule Engine (17 Schemes)</span>
+                </div>
+              </div>
+              <div class="dfd-arrow-down">&darr;</div>
+
+              <div class="dfd-step dfd-agent">
+                <span class="dfd-num">5</span>
+                <div class="dfd-text">
+                  <strong>Document Checklist &amp; Guide Manager (GroundingGate) &amp; Language Reviewer</strong>
+                  <span>Deduplicated Docs &bull; 3 Invariant Checks &bull; Verbatim Scheme Name Preservation</span>
+                </div>
+              </div>
+              <div class="dfd-arrow-down">&darr;</div>
+
+              <div class="dfd-step dfd-output">
+                <span class="dfd-num">6</span>
+                <div class="dfd-text">
+                  <strong>Verified Guide Output &amp; Write-Through Cache</strong>
+                  <span>Persist in PostgreSQL CITIZEN_SESSIONS &amp; Cache in Redis &bull; Localized UI</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Intelligent Caching, Startup Pre-Warming &amp; Citizen Guidance</div>
+          <div class="card-content">
+            <p><strong>1. Query Caching &amp; DB Storage Lifecycle:</strong><br>
+            &bull; <em>New Query:</em> Executes 6-agent pipeline, persists to PostgreSQL (<code>CITIZEN_SESSIONS</code>, <code>query_cache_audit</code>), and writes through to Redis.<br>
+            &bull; <em>Repeated Query:</em> Fetches directly from Redis Cache / DB, <strong>reducing computation power by 99%</strong> (0 LLM tokens, 0 agent invocations, sub-5ms latency).<br>
+            &bull; <em>Startup Cache Pre-Warming:</em> At session/server boot, all 17 welfare schemes, policy chunks, 256-dim trigram vector embeddings, and known cached queries from PostgreSQL are pre-loaded into Redis cache so queries hit high-speed RAM immediately.</p>
+
+            <p><strong>2. Missing Info &amp; Dynamic Clarifications (Zero Doubts):</strong><br>
+            If a scheme requires additional parameters (e.g. land acreage, girl child age, BPL card), the system identifies the gap and actively prompts the user with 1-click clarification chips, eliminating citizen confusion.</p>
+
+            <p><strong>3. Transparent Rejection Reasons:</strong><br>
+            For non-matched schemes, the system explicitly details the exact failed rule boundaries (e.g. <code>Income ₹7.5L &gt; ₹6L cap</code>, <code>Owns pucca house</code>) along with direct official portal URLs.</p>
+
+            <p><strong>4. Step-by-Step Portal Application Instructions in Citizen's Desired Language:</strong><br>
+            Clicking on any scheme card on the UI opens an interactive walkthrough displaying step-by-step portal procedures, required documents with issuing offices, and direct official <code>.gov.in</code> portal links.</p>
+          </div>
+        </div>
+      </div>
+      <div class="slide-footer">
+        <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
+        <span>2 / 17</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Problem Statement & Motivation -->
+    <div class="slide" id="slide-3">
       <div class="slide-header">
         <div class="slide-tag">Problem Statement &amp; Motivation</div>
         <div class="slide-title">The Citizen Welfare Access Dilemma in India</div>
@@ -407,12 +615,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>2 / 16</span>
+        <span>3 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 3: Microservices Topology -->
-    <div class="slide" id="slide-3">
+    <!-- SLIDE 4: Microservices Topology -->
+    <div class="slide" id="slide-4">
       <div class="slide-header">
         <div class="slide-tag">System Architecture</div>
         <div class="slide-title">Decoupled Microservice Topology &amp; Ports</div>
@@ -443,12 +651,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>3 / 16</span>
+        <span>4 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 4: Multi-Agent Sequential Pipeline -->
-    <div class="slide" id="slide-4">
+    <!-- SLIDE 5: Multi-Agent Sequential Pipeline -->
+    <div class="slide" id="slide-5">
       <div class="slide-header">
         <div class="slide-tag">Multi-Agent Coordination</div>
         <div class="slide-title">Microsoft Agent Framework Sequential Orchestration</div>
@@ -475,12 +683,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>4 / 16</span>
+        <span>5 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 5: Agent 1 - Profile Intake Agent -->
-    <div class="slide" id="slide-5">
+    <!-- SLIDE 6: Agent 1 - Profile Intake Agent -->
+    <div class="slide" id="slide-6">
       <div class="slide-header">
         <div class="slide-tag">Specialized Agent 1 / 6</div>
         <div class="slide-title">Profile Intake Agent (Language &amp; Demographics)</div>
@@ -508,12 +716,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>5 / 16</span>
+        <span>6 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 6: Agent 2 - Scheme Retrieval Agent -->
-    <div class="slide" id="slide-6">
+    <!-- SLIDE 7: Agent 2 - Scheme Retrieval Agent -->
+    <div class="slide" id="slide-7">
       <div class="slide-header">
         <div class="slide-tag">Specialized Agent 2 / 6</div>
         <div class="slide-title">Scheme Retrieval Agent (Hybrid BM25 + Vector RAG)</div>
@@ -541,12 +749,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>6 / 16</span>
+        <span>7 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 7: Agent 3 - Eligibility Rule Agent -->
-    <div class="slide" id="slide-7">
+    <!-- SLIDE 8: Agent 3 - Eligibility Rule Agent -->
+    <div class="slide" id="slide-8">
       <div class="slide-header">
         <div class="slide-tag">Specialized Agent 3 / 6</div>
         <div class="slide-title">Eligibility Rule Agent (Deterministic Strategy Engine)</div>
@@ -577,12 +785,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>7 / 16</span>
+        <span>8 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 8: Agent 4 - Document Checklist Agent -->
-    <div class="slide" id="slide-8">
+    <!-- SLIDE 9: Agent 4 - Document Checklist Agent -->
+    <div class="slide" id="slide-9">
       <div class="slide-header">
         <div class="slide-tag">Specialized Agent 4 / 6</div>
         <div class="slide-title">Document Checklist Agent (Deduplication &amp; Authorities)</div>
@@ -612,12 +820,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>8 / 16</span>
+        <span>9 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 9: Agent 5 - Guide Manager & GroundingGate -->
-    <div class="slide" id="slide-9">
+    <!-- SLIDE 10: Agent 5 - Guide Manager & GroundingGate -->
+    <div class="slide" id="slide-10">
       <div class="slide-header">
         <div class="slide-tag">Specialized Agent 5 / 6</div>
         <div class="slide-title">Guide Manager Agent &amp; GroundingGate Verification</div>
@@ -647,12 +855,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>9 / 16</span>
+        <span>10 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 10: Agent 6 - Language-Consistency Reviewer Agent -->
-    <div class="slide" id="slide-10">
+    <!-- SLIDE 11: Agent 6 - Language-Consistency Reviewer Agent -->
+    <div class="slide" id="slide-11">
       <div class="slide-header">
         <div class="slide-tag">Specialized Agent 6 / 6 (Group-of-3 Add-On)</div>
         <div class="slide-title">Language Reviewer Agent (Quality Assurance &amp; Auto-Repair)</div>
@@ -680,12 +888,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>10 / 16</span>
+        <span>11 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 11: Multilingual Voice & Speech Service -->
-    <div class="slide" id="slide-11">
+    <!-- SLIDE 12: Multilingual Voice & Speech Service -->
+    <div class="slide" id="slide-12">
       <div class="slide-header">
         <div class="slide-tag">Multilingual NLP &amp; Voice</div>
         <div class="slide-title">Voice &amp; Speech Microservice (:8004)</div>
@@ -717,12 +925,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>11 / 16</span>
+        <span>12 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 12: Database Design & Redis Caching -->
-    <div class="slide" id="slide-12">
+    <!-- SLIDE 13: Database Design & Redis Caching -->
+    <div class="slide" id="slide-13">
       <div class="slide-header">
         <div class="slide-tag">Data &amp; Caching Architecture</div>
         <div class="slide-title">PostgreSQL 16 Schema &amp; Two-Tier Redis Cache</div>
@@ -755,12 +963,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>12 / 16</span>
+        <span>13 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 13: Software Engineering & LLD -->
-    <div class="slide" id="slide-13">
+    <!-- SLIDE 14: Software Engineering & LLD -->
+    <div class="slide" id="slide-14">
       <div class="slide-header">
         <div class="slide-tag">Low-Level Design (LLD)</div>
         <div class="slide-title">Software Engineering Rigor: SOLID Principles &amp; Design Patterns</div>
@@ -787,12 +995,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>13 / 16</span>
+        <span>14 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 14: Evaluation & Benchmark -->
-    <div class="slide" id="slide-14">
+    <!-- SLIDE 15: Evaluation & Benchmark -->
+    <div class="slide" id="slide-15">
       <div class="slide-header">
         <div class="slide-tag">CO3 &amp; CO4 Evaluation</div>
         <div class="slide-title">Quantitative Evaluation Benchmark (10 Multilingual Profiles)</div>
@@ -884,12 +1092,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>14 / 16</span>
+        <span>15 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 15: Deployment & Execution -->
-    <div class="slide" id="slide-15">
+    <!-- SLIDE 16: Deployment & Execution -->
+    <div class="slide" id="slide-16">
       <div class="slide-header">
         <div class="slide-tag">Deployment &amp; Execution</div>
         <div class="slide-title">Three Deployment Modes &amp; Automated Verification</div>
@@ -941,12 +1149,12 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>15 / 16</span>
+        <span>16 / 17</span>
       </div>
     </div>
 
-    <!-- SLIDE 16: Summary, Academic Impact & Future Roadmap -->
-    <div class="slide" id="slide-16">
+    <!-- SLIDE 17: Summary, Academic Impact & Future Roadmap -->
+    <div class="slide" id="slide-17">
       <div class="slide-header">
         <div class="slide-tag">Conclusion &amp; Q&amp;A</div>
         <div class="slide-title">Academic Attainment, Future Roadmap &amp; Project Links</div>
@@ -981,7 +1189,7 @@
       </div>
       <div class="slide-footer">
         <span>JanSahayak: Multilingual Government Scheme Eligibility Guide | LPU CSE476</span>
-        <span>16 / 16</span>
+        <span>17 / 17</span>
       </div>
     </div>
 
@@ -990,7 +1198,7 @@
   <!-- Interactive Controls Bar -->
   <div class="controls-bar">
     <button class="nav-btn" onclick="prevSlide()">&larr; Previous</button>
-    <span id="slideIndicator" style="font-weight: 700; color: #ffffff;">Slide 1 of 16</span>
+    <span id="slideIndicator" style="font-weight: 700; color: #ffffff;">Slide 1 of 17</span>
     <button class="nav-btn" onclick="nextSlide()">Next &rarr;</button>
     <button class="nav-btn" onclick="toggleFullscreen()">Fullscreen (F)</button>
     <span style="font-size: 11.5px; color: #64748b;">(Use &larr; / &rarr; keys or Space to navigate)</span>
@@ -998,7 +1206,7 @@
 
   <script>
     let currentSlide = 1;
-    const totalSlides = 16;
+    const totalSlides = 17;
 
     function showSlide(index) {
       if (index < 1) index = 1;

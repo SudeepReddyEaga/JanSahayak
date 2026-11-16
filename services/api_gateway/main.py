@@ -244,10 +244,18 @@ class GatewayServiceFacade:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Initialize Gateway facade and verify DB/Redis connections at startup."""
+    """Initialize Gateway facade, pre-warm Redis cache from DB, and verify connections at startup."""
     settings = get_settings()
-    app.state.gateway = GatewayServiceFacade(settings)
-    logger.info(f"API Gateway started (mode={settings.orchestration_mode}).")
+    gateway = GatewayServiceFacade(settings)
+    app.state.gateway = gateway
+    try:
+        # Pre-warm Redis cache with all DB schemes, policy chunks, and past citizen queries
+        warmed = gateway.semantic_cache.prewarm_cache_from_db(gateway.db_manager)
+        logger.info(
+            f"API Gateway started (mode={settings.orchestration_mode}, pre-warmed={warmed} items into Redis)."
+        )
+    except Exception as exc:
+        logger.warning(f"Cache pre-warming skipped on startup: {exc}")
     yield
 
 

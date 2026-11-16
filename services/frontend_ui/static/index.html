@@ -468,6 +468,70 @@
     </section>
   </main>
 
+  <!-- ========================================================================
+       Interactive Step-by-Step Portal Application Guide & Document Walkthrough Modal
+       Appears when the user clicks on any scheme card to explain portal workflows & papers
+       ======================================================================== -->
+  <div id="schemeWalkthroughModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalSchemeTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="badge" id="modalCategoryBadge" style="background: rgba(255,255,255,0.2); color:#ffffff; font-weight:700;">Sector</span>
+          <h2 id="modalSchemeTitle" style="margin:6px 0 2px; font-size:1.25rem;">Scheme Title</h2>
+          <div class="muted" id="modalMinistryText" style="color:#cbd5e1; font-size:0.82rem;">Nodal Ministry</div>
+        </div>
+        <button type="button" id="closeModalBtn" class="close-btn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body" id="modalBody">
+        <!-- Direct Official Portal URL + Audio Guidance Bar -->
+        <div class="modal-action-bar">
+          <a id="modalOfficialPortalLink" href="#" target="_blank" rel="noopener" class="btn btn-primary" title="Open official government portal">
+            🌐 Open Official Portal &rarr;
+          </a>
+          <button type="button" id="modalSpeakBtn" class="btn btn-secondary" title="Read step-by-step instructions aloud">
+            🔊 Listen Instructions Aloud
+          </button>
+          <span class="badge badge-neutral" id="modalHelplineBadge">Helpline</span>
+        </div>
+
+        <!-- Localized Benefit Summary & Why Qualified -->
+        <div class="modal-section" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px;">
+          <h4 id="modalBenefitHeading" style="margin:0 0 4px; color:#0f172a; font-weight:700;">Benefit Summary</h4>
+          <p id="modalBenefitSummary" class="modal-text" style="margin-bottom:8px;"></p>
+          <h4 id="modalWhyQualifiedHeading" style="margin:0 0 4px; color:#0f172a; font-weight:700;">Why Qualified</h4>
+          <p id="modalWhyQualifiedText" class="modal-text" style="margin-bottom:0;"></p>
+        </div>
+
+        <!-- Step-by-Step Application Instructions in Citizen's Desired Language -->
+        <div class="modal-section">
+          <h3 id="modalStepsHeading" style="color:var(--primary); font-size:1.05rem;">
+            Step-by-Step Official Portal Application Guide
+          </h3>
+          <p class="muted" id="modalStepsIntro" style="font-size:0.82rem; margin-bottom:8px;">
+            Follow these sequential steps on the official government website to complete your application:
+          </p>
+          <ol id="modalStepsList" class="step-guide-list"></ol>
+        </div>
+
+        <!-- Required Documents Checklist & Where to Obtain -->
+        <div class="modal-section">
+          <h3 id="modalDocsHeading" style="color:var(--primary); font-size:1.05rem;">
+            Required Official Documents &amp; Where to Obtain
+          </h3>
+          <p class="muted" id="modalDocsIntro" style="font-size:0.82rem; margin-bottom:8px;">
+            Keep these original documents and photocopies ready before visiting the portal or Common Service Centre:
+          </p>
+          <div id="modalDocsList" class="modal-docs-grid"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="closeModalFooterBtn" class="btn btn-secondary">Close Guide</button>
+      </div>
+    </div>
+  </div>
+
   <script src="/static/ui_translations.js"></script>
   <script src="/static/scheme_metrics.js"></script>
   <script src="/static/voice_controller.js"></script>

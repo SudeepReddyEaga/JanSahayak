@@ -85,7 +85,7 @@ def create_deck():
             tf_n = num_box.text_frame
             p_n = tf_n.paragraphs[0]
             p_n.alignment = PP_ALIGN.RIGHT
-            p_n.text = f"{slide_num} / 16"
+            p_n.text = f"{slide_num} / 17"
             p_n.font.size = Pt(9.5)
             p_n.font.bold = True
             p_n.font.color.rgb = TEXT_MUTED
@@ -240,10 +240,115 @@ def create_deck():
         run.font.color.rgb = RGBColor(226, 232, 240)
 
     # -------------------------------------------------------------
-    # SLIDE 2: Problem Statement & Real-World Motivation
+    # SLIDE 2: Multi-Agent DFD, Query Caching Lifecycle & Interactive Guidance
+    # -------------------------------------------------------------
+    s_dfd = prs.slides.add_slide(blank_layout)
+    add_header(s_dfd, "Multi-Agent DFD, Query Caching Lifecycle & Interactive Guidance", "SYSTEM ARCHITECTURE & DFD", 2)
+
+    c_dfd1 = create_card(s_dfd, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Detailed Multi-Agent DFD Workflow")
+    c_dfd1.paragraphs[0].text = "1. Citizen Input (Voice STT / Text):"
+    c_dfd1.paragraphs[0].font.bold = True
+    c_dfd1.paragraphs[0].font.size = Pt(11.5)
+    p = c_dfd1.add_paragraph()
+    p.text = "   12 Indian Languages (en, hi, pa, te, ta, bn, mr, kn, gu, ml, or, ur RTL)."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd1.add_paragraph()
+    p.text = "2. Redis Two-Tier Cache Lookup:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd1.add_paragraph()
+    p.text = "   Exact O(1) & Cosine Semantic >= 0.90 -> Hit returns in <5ms with 0 tokens."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd1.add_paragraph()
+    p.text = "3. Profile Intake Agent:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd1.add_paragraph()
+    p.text = "   Script detection, Indic/Urdu numerals -> 14 demographic slots -> Shared Memory."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd1.add_paragraph()
+    p.text = "4. Scheme Retrieval (Hybrid RAG) & Eligibility Rule Agent:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd1.add_paragraph()
+    p.text = "   BM25 + Trigram Vector search -> Top 10 -> Deterministic rule AST execution."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd1.add_paragraph()
+    p.text = "5. Checklist, Guide Manager & Language Reviewer:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd1.add_paragraph()
+    p.text = "   Deduplicates papers -> GroundingGate verifies 3 invariants -> Scheme names verbatim."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd1.add_paragraph()
+    p.text = "6. Verified Output & Write-Through Storage:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd1.add_paragraph()
+    p.text = "   Persisted in PostgreSQL CITIZEN_SESSIONS and cached in Redis."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    c_dfd2 = create_card(s_dfd, Inches(6.8), Inches(1.4), Inches(5.7), Inches(5.3), "Intelligent Caching, Startup Pre-Warming & Guidance")
+    c_dfd2.paragraphs[0].text = "• Query Caching & Database Storage Lifecycle:"
+    c_dfd2.paragraphs[0].font.bold = True
+    c_dfd2.paragraphs[0].font.size = Pt(11.5)
+    p = c_dfd2.add_paragraph()
+    p.text = "  New queries run the 6-agent chain, persist to PostgreSQL (CITIZEN_SESSIONS, query_cache_audit), and write through to Redis. Repeated queries fetch directly from Redis/DB, saving 99% computation power (0 tokens, 0 agent invocations, <5ms latency)."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd2.add_paragraph()
+    p.text = "• Startup Cache Pre-Warming:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd2.add_paragraph()
+    p.text = "  At server startup, all 17 welfare schemes, policy chunks, 256-dim vector embeddings, and known cached queries from PostgreSQL are pre-loaded into Redis RAM for instant zero-latency retrieval."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd2.add_paragraph()
+    p.text = "• Missing Info & Dynamic Clarifications (Zero Doubts):"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd2.add_paragraph()
+    p.text = "  If a scheme needs more info to verify eligibility, the system actively prompts the citizen with 1-click clarification chips, eliminating all doubts."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd2.add_paragraph()
+    p.text = "• Transparent Rejection Reasons & Official Links:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd2.add_paragraph()
+    p.text = "  Ineligible schemes explicitly list the exact statutory criteria failed (e.g. income cap, pucca house) with official .gov.in portal links."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    p = c_dfd2.add_paragraph()
+    p.text = "• Localized Step-by-Step Portal Application Guide:"
+    p.font.bold = True
+    p.font.size = Pt(11.5)
+    p = c_dfd2.add_paragraph()
+    p.text = "  Clicking any scheme on the UI opens an interactive modal detailing step-by-step portal instructions and required documents in the citizen's chosen language."
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = TEXT_MUTED
+
+    # -------------------------------------------------------------
+    # SLIDE 3: Problem Statement & Real-World Motivation
     # -------------------------------------------------------------
     s2 = prs.slides.add_slide(blank_layout)
-    add_header(s2, "Real-World Problem & System Objectives", "PROBLEM STATEMENT & MOTIVATION", 2)
+    add_header(s2, "Real-World Problem & System Objectives", "PROBLEM STATEMENT & MOTIVATION", 3)
 
     c2_1 = create_card(s2, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "The Citizen Welfare Dilemma in India")
     c2_1.paragraphs[0].text = "• Extreme Linguistic Fragmentation:"
@@ -318,10 +423,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 3: Microservices Architecture & System Topology
+    # SLIDE 4: Microservices Architecture & System Topology
     # -------------------------------------------------------------
     s3 = prs.slides.add_slide(blank_layout)
-    add_header(s3, "Decoupled Microservice Topology & Network Infrastructure", "SYSTEM ARCHITECTURE", 3)
+    add_header(s3, "Decoupled Microservice Topology & Network Infrastructure", "SYSTEM ARCHITECTURE", 4)
 
     c3_1 = create_card(s3, Inches(0.8), Inches(1.4), Inches(3.7), Inches(5.3), "Client & Edge Gateway")
     c3_1.paragraphs[0].text = "1. frontend-ui (:3000)"
@@ -390,10 +495,10 @@ def create_deck():
     p.font.color.rgb = GREEN
 
     # -------------------------------------------------------------
-    # SLIDE 4: Microsoft Agent Framework Sequential Pipeline
+    # SLIDE 5: Microsoft Agent Framework Sequential Pipeline
     # -------------------------------------------------------------
     s4 = prs.slides.add_slide(blank_layout)
-    add_header(s4, "Microsoft Agent Framework Sequential Orchestration", "MULTI-AGENT COORDINATION", 4)
+    add_header(s4, "Microsoft Agent Framework Sequential Orchestration", "MULTI-AGENT COORDINATION", 5)
 
     c4_1 = create_card(s4, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Why Sequential Pipeline Architecture?")
     c4_1.paragraphs[0].text = "• Linear Administrative Workflow:"
@@ -468,10 +573,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 5: Agent 1 - Profile Intake Agent
+    # SLIDE 6: Agent 1 - Profile Intake Agent
     # -------------------------------------------------------------
     s5 = prs.slides.add_slide(blank_layout)
-    add_header(s5, "Agent 1: Profile Intake Agent (Language & Demographics)", "SPECIALIZED AGENT BREAKDOWN", 5)
+    add_header(s5, "Agent 1: Profile Intake Agent (Language & Demographics)", "SPECIALIZED AGENT BREAKDOWN", 6)
 
     c5_1 = create_card(s5, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Detection & Extraction Engine")
     c5_1.paragraphs[0].text = "• 12-Language Script Detection Algorithm:"
@@ -537,10 +642,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 6: Agent 2 - Scheme Retrieval Agent
+    # SLIDE 7: Agent 2 - Scheme Retrieval Agent
     # -------------------------------------------------------------
     s6 = prs.slides.add_slide(blank_layout)
-    add_header(s6, "Agent 2: Scheme Retrieval Agent (Hybrid BM25 + Vector RAG)", "SPECIALIZED AGENT BREAKDOWN", 6)
+    add_header(s6, "Agent 2: Scheme Retrieval Agent (Hybrid BM25 + Vector RAG)", "SPECIALIZED AGENT BREAKDOWN", 7)
 
     c6_1 = create_card(s6, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Hybrid Retrieval Architecture")
     c6_1.paragraphs[0].text = "• Why Pure Keyword or Vector Fails Alone:"
@@ -606,10 +711,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 7: Agent 3 - Eligibility Rule Agent
+    # SLIDE 8: Agent 3 - Eligibility Rule Agent
     # -------------------------------------------------------------
     s7 = prs.slides.add_slide(blank_layout)
-    add_header(s7, "Agent 3: Eligibility Rule Agent (Deterministic Strategy Engine)", "SPECIALIZED AGENT BREAKDOWN", 7)
+    add_header(s7, "Agent 3: Eligibility Rule Agent (Deterministic Strategy Engine)", "SPECIALIZED AGENT BREAKDOWN", 8)
 
     c7_1 = create_card(s7, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Strategy Pattern Rule Evaluator")
     c7_1.paragraphs[0].text = "• Strategy Pattern Comparator Dispatch:"
@@ -666,10 +771,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 8: Agent 4 - Document Checklist Agent
+    # SLIDE 9: Agent 4 - Document Checklist Agent
     # -------------------------------------------------------------
     s8 = prs.slides.add_slide(blank_layout)
-    add_header(s8, "Agent 4: Document Checklist Agent (Deduplication & Authorities)", "SPECIALIZED AGENT BREAKDOWN", 8)
+    add_header(s8, "Agent 4: Document Checklist Agent (Deduplication & Authorities)", "SPECIALIZED AGENT BREAKDOWN", 9)
 
     c8_1 = create_card(s8, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Cross-Scheme Merging & Deduplication")
     c8_1.paragraphs[0].text = "• The Multi-Scheme Document Problem:"
@@ -726,10 +831,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 9: Agent 5 - Guide Manager Agent & GroundingGate
+    # SLIDE 10: Agent 5 - Guide Manager Agent & GroundingGate
     # -------------------------------------------------------------
     s9 = prs.slides.add_slide(blank_layout)
-    add_header(s9, "Agent 5: Guide Manager Agent & GroundingGate Verification", "SPECIALIZED AGENT BREAKDOWN", 9)
+    add_header(s9, "Agent 5: Guide Manager Agent & GroundingGate Verification", "SPECIALIZED AGENT BREAKDOWN", 10)
 
     c9_1 = create_card(s9, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "The GroundingGate Audit Check")
     c9_1.paragraphs[0].text = "• Three Mandatory Grounding Invariants:"
@@ -777,10 +882,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 10: Agent 6 - Language-Consistency Reviewer Agent
+    # SLIDE 11: Agent 6 - Language-Consistency Reviewer Agent
     # -------------------------------------------------------------
     s10 = prs.slides.add_slide(blank_layout)
-    add_header(s10, "Agent 6: Language Reviewer Agent (Group-of-3 Quality Add-On)", "SPECIALIZED AGENT BREAKDOWN", 10)
+    add_header(s10, "Agent 6: Language Reviewer Agent (Group-of-3 Quality Add-On)", "SPECIALIZED AGENT BREAKDOWN", 11)
 
     c10_1 = create_card(s10, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Two Quality Invariants Audited")
     c10_1.paragraphs[0].text = "• Invariant 1: Target Language Script Consistency:"
@@ -828,10 +933,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 11: Multilingual NLP & Voice Service
+    # SLIDE 12: Multilingual NLP & Voice Service
     # -------------------------------------------------------------
     s11 = prs.slides.add_slide(blank_layout)
-    add_header(s11, "Multilingual Voice & Speech Microservice Architecture", "MULTILINGUAL NLP & VOICE", 11)
+    add_header(s11, "Multilingual Voice & Speech Microservice Architecture", "MULTILINGUAL NLP & VOICE", 12)
 
     c11_1 = create_card(s11, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "12 Indian Languages & Voice Locales")
     c11_1.paragraphs[0].text = "• Supported Languages Across India:"
@@ -897,10 +1002,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 12: Database Design & Redis Two-Tier Caching
+    # SLIDE 13: Database Design & Redis Two-Tier Caching
     # -------------------------------------------------------------
     s12 = prs.slides.add_slide(blank_layout)
-    add_header(s12, "PostgreSQL 16 Schema & Profile-Guarded Redis Cache", "DATA & CACHING ARCHITECTURE", 12)
+    add_header(s12, "PostgreSQL 16 Schema & Profile-Guarded Redis Cache", "DATA & CACHING ARCHITECTURE", 13)
 
     c12_1 = create_card(s12, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "PostgreSQL 16 Relational + JSONB Schema")
     c12_1.paragraphs[0].text = "• Relational 3NF Entities:"
@@ -957,10 +1062,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 13: Software Engineering & Low-Level Design (LLD)
+    # SLIDE 14: Software Engineering & Low-Level Design (LLD)
     # -------------------------------------------------------------
     s13 = prs.slides.add_slide(blank_layout)
-    add_header(s13, "Software Engineering Rigor: SOLID Principles & Design Patterns", "LOW-LEVEL DESIGN (LLD)", 13)
+    add_header(s13, "Software Engineering Rigor: SOLID Principles & Design Patterns", "LOW-LEVEL DESIGN (LLD)", 14)
 
     c13_1 = create_card(s13, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "SOLID Principles Implementation")
     c13_1.paragraphs[0].text = "• Single Responsibility (SRP):"
@@ -1035,10 +1140,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 14: Experimental Evaluation & Benchmark (CO3 & CO4)
+    # SLIDE 15: Experimental Evaluation & Benchmark (CO3 & CO4)
     # -------------------------------------------------------------
     s14 = prs.slides.add_slide(blank_layout)
-    add_header(s14, "Quantitative Evaluation Benchmark (10 Multilingual Profiles)", "CO3 & CO4 EVALUATION", 14)
+    add_header(s14, "Quantitative Evaluation Benchmark (10 Multilingual Profiles)", "CO3 & CO4 EVALUATION", 15)
 
     # 4 Metric Callout Boxes
     metric_configs = [
@@ -1117,10 +1222,10 @@ def create_deck():
                 p.font.color.rgb = GREEN
 
     # -------------------------------------------------------------
-    # SLIDE 15: Deployment & Verification
+    # SLIDE 16: Deployment & Verification
     # -------------------------------------------------------------
     s15 = prs.slides.add_slide(blank_layout)
-    add_header(s15, "Three Flexible Deployment Modes & Automated Verification", "DEPLOYMENT & EXECUTION", 15)
+    add_header(s15, "Three Flexible Deployment Modes & Automated Verification", "DEPLOYMENT & EXECUTION", 16)
 
     c15_1 = create_card(s15, Inches(0.8), Inches(1.4), Inches(3.7), Inches(5.3), "Option A: Docker Compose")
     c15_1.paragraphs[0].text = "• Production Microservice Stack:"
@@ -1150,10 +1255,10 @@ def create_deck():
     p.font.color.rgb = TEXT_MUTED
 
     # -------------------------------------------------------------
-    # SLIDE 16: Summary, Academic Impact & Future Roadmap
+    # SLIDE 17: Summary, Academic Impact & Future Roadmap
     # -------------------------------------------------------------
     s16 = prs.slides.add_slide(blank_layout)
-    add_header(s16, "Project Summary, Academic Attainment & Future Roadmap", "CONCLUSION & Q&A", 16)
+    add_header(s16, "Project Summary, Academic Attainment & Future Roadmap", "CONCLUSION & Q&A", 17)
 
     c16_1 = create_card(s16, Inches(0.8), Inches(1.4), Inches(5.6), Inches(5.3), "Academic Learning Outcomes Fulfilled")
     c16_1.paragraphs[0].text = "• CO3 Attainment (Multi-Agent Architecture & RAG):"
